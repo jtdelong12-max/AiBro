@@ -44,6 +44,12 @@ data "Boosts" "AiArchetypeOverride(AI_fighter_ranged,1)"
 data "StatusPropertyFlags" "DisableCombatlog;DisableOverhead;DisablePortraitIndicator"
 data "RemoveEvents" "OnCombatEnded"
 
+new entry "AI_HELPER_BUFF_MASSIVE"
+type "StatusData"
+data "StatusType" "BOOST"
+data "StatusPropertyFlags" "DisableCombatlog;DisableOverhead;DisablePortraitIndicator"
+data "RemoveEvents" "OnTurn"
+
 new entry "AI_ALLIES_HEALER_MELEE"
 type "StatusData"
 data "StatusType" "BOOST"

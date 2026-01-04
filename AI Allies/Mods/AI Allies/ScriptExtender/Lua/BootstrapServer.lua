@@ -298,29 +298,31 @@ end)
 
 ----------------------------------------------------------------------------------------------
 -- MCM Listeners
-Ext.ModEvents.BG3MCM["MCM_Setting_Saved"]:Subscribe(function(payload)
-    if not payload or payload.modUUID ~= ModuleUUID or not payload.settingId then
-        return
-    end
-    
-    if payload.settingId == "enableCustomArchetypes" then
-        ManageCustomArchetypes()
-    elseif payload.settingId == "enableAlliesMind" then
-        ManageAlliesMind()
-    elseif payload.settingId == "disableAlliesDashing" then
-        ManageAlliesDashing()
-    elseif payload.settingId == "disableAlliesThrowing" then
-        ManageAlliesThrowing()
-    elseif payload.settingId == "enableDynamicSpellblock" then
-        ManageDynamicSpellblock()
-    elseif payload.settingId == "enableAlliesSwarm" then
-        ManageAlliesSwarm()
-    elseif payload.settingId == "enableOrdersBonusAction" then
-        ManageOrderSpellsPassive()
-    elseif payload.settingId == "enableDebugSpells" then
-        ManageDebugSpells()
-    end
-end)
+if Ext.ModEvents.BG3MCM and Ext.ModEvents.BG3MCM["MCM_Setting_Saved"] then
+    Ext.ModEvents.BG3MCM["MCM_Setting_Saved"]:Subscribe(function(payload)
+        if not payload or payload.modUUID ~= ModuleUUID or not payload.settingId then
+            return
+        end
+        
+        if payload.settingId == "enableCustomArchetypes" then
+            ManageCustomArchetypes()
+        elseif payload.settingId == "enableAlliesMind" then
+            ManageAlliesMind()
+        elseif payload.settingId == "disableAlliesDashing" then
+            ManageAlliesDashing()
+        elseif payload.settingId == "disableAlliesThrowing" then
+            ManageAlliesThrowing()
+        elseif payload.settingId == "enableDynamicSpellblock" then
+            ManageDynamicSpellblock()
+        elseif payload.settingId == "enableAlliesSwarm" then
+            ManageAlliesSwarm()
+        elseif payload.settingId == "enableOrdersBonusAction" then
+            ManageOrderSpellsPassive()
+        elseif payload.settingId == "enableDebugSpells" then
+            ManageDebugSpells()
+        end
+    end)
+end
 
 ----------------------------------------------------------------------------------------------
 -- List of AI statuses to track for CurrentAllies
@@ -560,7 +562,16 @@ end
 
 local function TeleportCharacterToPlayer(character, alwaysTeleport)
     local playerCharacter = Osi.GetHostCharacter()
-    if playerCharacter and character and (alwaysTeleport or CanFollow()) then
+    -- Add entity existence validation
+    if not playerCharacter or not character then
+        return
+    end
+    if not Osi.Exists(character) == 1 or not Osi.Exists(playerCharacter) == 1 then
+        Ext.Utils.Print("[WARNING] Cannot teleport - entity does not exist")
+        return
+    end
+    
+    if alwaysTeleport or CanFollow() then
         Osi.TeleportTo(character, playerCharacter)
         Ext.Utils.Print("Teleporting " .. character .. " to player: " .. playerCharacter)
         if CanFollow() then
@@ -726,10 +737,11 @@ Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function(object, combat
         ApplyStatusFromControllerBuff(object)
     end
     if hasControllerStatus(object) then
-        Osi.ApplyStatus(object, "AlliesBannedActions", -1)
+        -- Note: AlliesBannedActions removed - it was blocking too many utility spells
+        -- Only apply if specific problematic behaviors are observed
         Osi.ApplyStatus(object, "AI_ALLY", -1)
         Osi.ApplyStatus(object, "FOR_AI_SPELLS", -1)
-        --Ext.Utils.Print("(Entered Combat) Applied AlliesBannedActions to " .. object)
+        --Ext.Utils.Print("(Entered Combat) Applied AI statuses to " .. object)
     end
 end)
 
@@ -747,6 +759,17 @@ Ext.Osiris.RegisterListener("CombatEnded", 1, "after", function (combatGuid)
             if Osi.HasActiveStatus(uuid, status) == 1 then
                 Osi.RemoveStatus(uuid, status)
             end
+        end
+        
+        -- Clean up any orphaned statuses from _G.appliedStatuses to prevent AI freezing
+        if _G.appliedStatuses[uuid] then
+            for _, status in ipairs(_G.appliedStatuses[uuid]) do
+                if Osi.HasActiveStatus(uuid, status) == 1 then
+                    Osi.RemoveStatus(uuid, status)
+                    Ext.Utils.Print("[CLEANUP] Removed orphaned status " .. status .. " from " .. uuid)
+                end
+            end
+            _G.appliedStatuses[uuid] = nil
         end
     end
 end)
@@ -883,11 +906,20 @@ _G.currentlyProcessing = false
 local spellMappings = {
     ['Shout_ActionSurge'] = 'Shout_ActionSurge_AI',
     ['Shout_Dash'] = 'Shout_Dash_AI',
-    ['Shout_Dash_CunningAction'] = 'Shout_Dash_CunningAction_AI'
+    ['Shout_Dash_CunningAction'] = 'Shout_Dash_CunningAction_AI',
+    ['Shout_Rage_Berserker'] = 'Shout_Rage_Berserker_AI',
+    ['Shout_Rage_Wildheart'] = 'Shout_Rage_Wildheart_AI',
+    ['Shout_Rage_WildMagic'] = 'Shout_Rage_WildMagic_AI'
 }
 
 -- Function to add or remove AI spells based on the original spell
 local function ModifyAISpells(character, addSpell)
+    -- Validate entity exists before modifying spells
+    if not character or Osi.Exists(character) ~= 1 then
+        Ext.Utils.Print("[WARNING] Cannot modify spells - invalid character: " .. tostring(character))
+        return
+    end
+    
     for originalSpell, aiSpell in pairs(spellMappings) do
         local hasAIVersion = Osi.HasSpell(character, aiSpell) == 1
 
@@ -948,6 +980,24 @@ end)
 local relevantDialogInstance = nil
 local transformedCompanions = {}
 
+-- Cleanup function to recover from dialog crashes
+local function CleanupDialogState()
+    for actorUuid, _ in pairs(transformedCompanions) do
+        if Osi.Exists(actorUuid) == 1 and IsCurrentAlly(actorUuid) then
+            local actor = actorUuid
+            if HasRelevantStatus(actor) and Osi.IsInCombat(actor) == 1 then
+                Osi.MakeNPC(actorUuid)
+                Ext.Utils.Print("[RECOVERY] Reverted " .. actorUuid .. " back to NPC after session load")
+            end
+        end
+    end
+    transformedCompanions = {}
+    relevantDialogInstance = nil
+end
+
+-- Subscribe to SessionLoaded to clean up any stuck dialog states
+Ext.Events.SessionLoaded:Subscribe(CleanupDialogState)
+
 local function HasRelevantStatus(character)
     for _, status in ipairs(aiCombatStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 and Osi.HasActiveStatus(character, "ToggleIsNPC") == 1 then
@@ -970,6 +1020,11 @@ Ext.Osiris.RegisterListener("DialogStarted", 2, "after", HandleDialogStarted)
 
 local function HandleDialogActorJoined(instanceID, actor)
     local actorUuid = Osi.GetUUID(actor)
+    -- Validate entity exists
+    if not actorUuid or Osi.Exists(actor) ~= 1 then
+        return
+    end
+    
     if instanceID == relevantDialogInstance and IsCurrentAlly(actorUuid) and HasRelevantStatus(actor) then
         Osi.MakePlayer(actor)
         transformedCompanions[actorUuid] = true
@@ -984,7 +1039,10 @@ end)
 local function HandleDialogEnded(dialog, instanceID)
     if instanceID == relevantDialogInstance then
         for actorUuid, _ in pairs(transformedCompanions) do
-            if Osi.IsInCombat(actorUuid) == 0 then
+            -- Validate entity still exists
+            if Osi.Exists(actorUuid) ~= 1 then
+                Ext.Utils.Print("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion")
+            elseif Osi.IsInCombat(actorUuid) == 0 then
                 Ext.Utils.Print("Character " .. actorUuid .. " is not in combat, remaining as player character after dialog end.")
             else
                 Osi.MakeNPC(actorUuid)
@@ -1108,6 +1166,7 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", OnUsingSpellOnTarg
 ------------------------------------------------------------------------------------------------
 -- Testing - Pause combat when it starts to give AI time to initialize 
 local combatTimers = {}
+local combatStartTimes = {}
 
 local function OnTimerFinished(InitializeTimerAI)
     local combatGuid = combatTimers[InitializeTimerAI]
@@ -1115,6 +1174,7 @@ local function OnTimerFinished(InitializeTimerAI)
         Osi.ResumeCombat(combatGuid)
         Ext.Utils.Print("Resuming combat")
         combatTimers[InitializeTimerAI] = nil
+        combatStartTimes[combatGuid] = nil
     end
 end
 
@@ -1123,11 +1183,31 @@ Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     Ext.Utils.Print("Pausing combat to allow AI to initialize")
     local InitializeTimerAI = "ResumeCombatTimer_" .. tostring(combatGuid)
     combatTimers[InitializeTimerAI] = combatGuid
+    combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
     Osi.TimerLaunch(InitializeTimerAI, 2000)
 end)
 
 Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function(InitializeTimerAI)
     OnTimerFinished(InitializeTimerAI)
+end)
+
+-- Fallback: Force resume combat if it's been paused too long (safety mechanism)
+Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(entityGuid)
+    local combatGuid = Osi.CombatGetGuidFor(entityGuid)
+    if combatGuid and combatStartTimes[combatGuid] then
+        local elapsed = Ext.Utils.MonotonicTime() - combatStartTimes[combatGuid]
+        if elapsed > 60000 then -- 60 second safety timeout
+            Osi.ResumeCombat(combatGuid)
+            Ext.Utils.Print("[SAFETY] Force resuming combat after timeout: " .. combatGuid)
+            combatStartTimes[combatGuid] = nil
+            -- Clean up any related timers
+            for timer, guid in pairs(combatTimers) do
+                if guid == combatGuid then
+                    combatTimers[timer] = nil
+                end
+            end
+        end
+    end
 end)
 ------------------------------------------------------------------------------------------------
 -- Testing if longer pause = better performance
