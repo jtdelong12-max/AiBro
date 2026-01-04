@@ -54,6 +54,115 @@ local function SafeOsiCall(func, ...)
     return true, result
 end
 
+----------------------------------------------------------------------------------
+-- String Constants
+----------------------------------------------------------------------------------
+local STATUS = {
+    -- Controller Statuses
+    MELEE_CONTROLLER = "AI_ALLIES_MELEE_Controller",
+    RANGED_CONTROLLER = "AI_ALLIES_RANGED_Controller",
+    HEALER_MELEE_CONTROLLER = "AI_ALLIES_HEALER_MELEE_Controller",
+    HEALER_RANGED_CONTROLLER = "AI_ALLIES_HEALER_RANGED_Controller",
+    MAGE_MELEE_CONTROLLER = "AI_ALLIES_MAGE_MELEE_Controller",
+    MAGE_RANGED_CONTROLLER = "AI_ALLIES_MAGE_RANGED_Controller",
+    GENERAL_CONTROLLER = "AI_ALLIES_GENERAL_Controller",
+    TRICKSTER_CONTROLLER = "AI_ALLIES_TRICKSTER_Controller",
+    CUSTOM_CONTROLLER = "AI_ALLIES_CUSTOM_Controller",
+    CUSTOM_CONTROLLER_2 = "AI_ALLIES_CUSTOM_Controller_2",
+    CUSTOM_CONTROLLER_3 = "AI_ALLIES_CUSTOM_Controller_3",
+    CUSTOM_CONTROLLER_4 = "AI_ALLIES_CUSTOM_Controller_4",
+    THROWER_CONTROLLER = "AI_ALLIES_THROWER_CONTROLLER",
+    DEFAULT_CONTROLLER = "AI_ALLIES_DEFAULT_Controller",
+    AI_CONTROLLED = "AI_CONTROLLED",
+    
+    -- Combat Statuses (Player)
+    MELEE = "AI_ALLIES_MELEE",
+    RANGED = "AI_ALLIES_RANGED",
+    HEALER_MELEE = "AI_ALLIES_HEALER_MELEE",
+    HEALER_RANGED = "AI_ALLIES_HEALER_RANGED",
+    MAGE_MELEE = "AI_ALLIES_MAGE_MELEE",
+    MAGE_RANGED = "AI_ALLIES_MAGE_RANGED",
+    GENERAL = "AI_ALLIES_GENERAL",
+    TRICKSTER = "AI_ALLIES_TRICKSTER",
+    CUSTOM = "AI_ALLIES_CUSTOM",
+    CUSTOM_2 = "AI_ALLIES_CUSTOM_2",
+    CUSTOM_3 = "AI_ALLIES_CUSTOM_3",
+    CUSTOM_4 = "AI_ALLIES_CUSTOM_4",
+    THROWER = "AI_ALLIES_THROWER",
+    DEFAULT = "AI_ALLIES_DEFAULT",
+    
+    -- Combat Statuses (NPC)
+    MELEE_NPC = "AI_ALLIES_MELEE_NPC",
+    RANGED_NPC = "AI_ALLIES_RANGED_NPC",
+    HEALER_MELEE_NPC = "AI_ALLIES_HEALER_MELEE_NPC",
+    HEALER_RANGED_NPC = "AI_ALLIES_HEALER_RANGED_NPC",
+    MAGE_MELEE_NPC = "AI_ALLIES_MAGE_MELEE_NPC",
+    MAGE_RANGED_NPC = "AI_ALLIES_MAGE_RANGED_NPC",
+    GENERAL_NPC = "AI_ALLIES_GENERAL_NPC",
+    TRICKSTER_NPC = "AI_ALLIES_TRICKSTER_NPC",
+    CUSTOM_NPC = "AI_ALLIES_CUSTOM_NPC",
+    CUSTOM_2_NPC = "AI_ALLIES_CUSTOM_2_NPC",
+    CUSTOM_3_NPC = "AI_ALLIES_CUSTOM_3_NPC",
+    CUSTOM_4_NPC = "AI_ALLIES_CUSTOM_4_NPC",
+    THROWER_NPC = "AI_ALLIES_THROWER_NPC",
+    DEFAULT_NPC = "AI_ALLIES_DEFAULT_NPC",
+    
+    -- Special Statuses
+    AI_ALLY = "AI_ALLY",
+    AI_CANCEL = "AI_CANCEL",
+    FOR_AI_SPELLS = "FOR_AI_SPELLS",
+    TOGGLE_IS_NPC = "ToggleIsNPC",
+    ALLIES_WARNING = "ALLIES_WARNING",
+    ALLIES_MINDCONTROL = "ALLIES_MINDCONTROL",
+    ALLIES_ORDER_FOLLOW = "ALLIES_ORDER_FOLLOW",
+    AI_ALLIES_POSSESSED = "AI_ALLIES_POSSESSED",
+    MARK_NPC = "MARK_NPC",
+    MARK_PLAYER = "MARK_PLAYER",
+    FORCE_USE = "FORCE_USE",
+    FORCE_USE_MORE = "FORCE_USE_MORE",
+    FORCE_USE_MOST = "FORCE_USE_MOST"
+}
+
+local SPELL = {
+    -- AI Spell Variants
+    ACTION_SURGE_AI = "Shout_ActionSurge_AI",
+    DASH_AI = "Shout_Dash_AI",
+    DASH_CUNNING_AI = "Shout_Dash_CunningAction_AI",
+    RAGE_BERSERKER_AI = "Shout_Rage_Berserker_AI",
+    RAGE_WILDHEART_AI = "Shout_Rage_Wildheart_AI",
+    RAGE_WILDMAGIC_AI = "Shout_Rage_WildMagic_AI",
+    
+    -- Base Spells
+    ACTION_SURGE = "Shout_ActionSurge",
+    DASH = "Shout_Dash",
+    DASH_CUNNING = "Shout_Dash_CunningAction",
+    RAGE_BERSERKER = "Shout_Rage_Berserker",
+    RAGE_WILDHEART = "Shout_Rage_Wildheart",
+    RAGE_WILDMAGIC = "Shout_Rage_WildMagic",
+    
+    -- Special Spells
+    MINDCONTROL_TELEPORT = "Target_Allies_C_Order_Teleport",
+    ALLIES_TELEPORT = "C_Shout_Allies_Teleport",
+    FACTION_JOIN = "G_Target_Allies_Faction",
+    FACTION_LEAVE = "H_Target_Allies_Faction_Leave",
+    CHECK_ARCHETYPE = "I_Target_Allies_Check_Archetype"
+}
+
+local PASSIVE = {
+    UNLOCK_CUSTOM_ARCHETYPES = "UnlockCustomArchetypes",
+    ALLIES_MIND = "AlliesMind",
+    ALLIES_DASHING_DISABLED = "AlliesDashingDisabled",
+    ALLIES_THROWING_DISABLED = "AlliesThrowingDisabled",
+    ALLIES_DYNAMIC_SPELLBLOCK = "AlliesDynamicSpellblock",
+    ALLIES_SWARM = "AlliesSwarm",
+    UNLOCK_ALLIES_ORDERS = "UnlockAlliesOrders",
+    UNLOCK_ALLIES_ORDERS_BONUS = "UnlockAlliesOrdersBonus",
+    UNLOCK_ALLIES_EXTRA_SPELLS = "UnlockAlliesExtraSpells",
+    UNLOCK_ALLIES_EXTRA_SPELLS_ALT = "UnlockAlliesExtraSpells_ALT",
+    GIVE_ALLIES_SPELL = "GiveAlliesSpell",
+    ALLIES_TOGGLE_NPC = "AlliesToggleNPC"
+}
+
 
 Mods.AIAllies.PersistentVars = Mods.AIAllies.PersistentVars or {}
 Mods.AIAllies.PersistentVars.firstTimeRewardGiven = Mods.AIAllies.PersistentVars.firstTimeRewardGiven or false
@@ -126,27 +235,27 @@ end
 
 -- Legacy wrapper functions for backward compatibility
 local function ManageCustomArchetypes()
-    ManageMCMPassive("enableCustomArchetypes", "UnlockCustomArchetypes")
+    ManageMCMPassive("enableCustomArchetypes", PASSIVE.UNLOCK_CUSTOM_ARCHETYPES)
 end
 
 local function ManageAlliesMind()
-    ManageMCMPassive("enableAlliesMind", "AlliesMind")
+    ManageMCMPassive("enableAlliesMind", PASSIVE.ALLIES_MIND)
 end
 
 local function ManageAlliesDashing()
-    ManageMCMPassive("disableAlliesDashing", "AlliesDashingDisabled")
+    ManageMCMPassive("disableAlliesDashing", PASSIVE.ALLIES_DASHING_DISABLED)
 end
 
 local function ManageAlliesThrowing()
-    ManageMCMPassive("disableAlliesThrowing", "AlliesThrowingDisabled")
+    ManageMCMPassive("disableAlliesThrowing", PASSIVE.ALLIES_THROWING_DISABLED)
 end
 
 local function ManageDynamicSpellblock()
-    ManageMCMPassive("enableDynamicSpellblock", "AlliesDynamicSpellblock")
+    ManageMCMPassive("enableDynamicSpellblock", PASSIVE.ALLIES_DYNAMIC_SPELLBLOCK)
 end
 
 local function ManageAlliesSwarm()
-    ManageMCMPassive("enableAlliesSwarm", "AlliesSwarm")
+    ManageMCMPassive("enableAlliesSwarm", PASSIVE.ALLIES_SWARM)
 end
 
 local function ManageOrderSpellsPassive()
@@ -156,26 +265,26 @@ local function ManageOrderSpellsPassive()
         for _, player in pairs(players) do
             local character = player[1]
             if enableOrdersBonusAction then
-                if Osi.HasPassive(character, 'UnlockAlliesOrders') == 1 then
-                    Osi.RemovePassive(character, 'UnlockAlliesOrders')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS) == 1 then
+                    Osi.RemovePassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS)
                 end
-                if Osi.HasPassive(character, 'UnlockAlliesOrdersBonus') == 0 then
-                    Osi.AddPassive(character, 'UnlockAlliesOrdersBonus')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS_BONUS) == 0 then
+                    Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS_BONUS)
                 end
             else
-                if Osi.HasPassive(character, 'UnlockAlliesOrdersBonus') == 1 then
-                    Osi.RemovePassive(character, 'UnlockAlliesOrdersBonus')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS_BONUS) == 1 then
+                    Osi.RemovePassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS_BONUS)
                 end
-                if Osi.HasPassive(character, 'UnlockAlliesOrders') == 0 then
-                    Osi.AddPassive(character, 'UnlockAlliesOrders')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS) == 0 then
+                    Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS)
                 end
             end
         end
     else
         for _, player in pairs(players) do
             local character = player[1]
-            if Osi.HasPassive(character, 'UnlockAlliesOrders') == 0 then
-                Osi.AddPassive(character, 'UnlockAlliesOrders')
+            if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS) == 0 then
+                Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS)
             end
         end
     end
@@ -188,18 +297,18 @@ local function ManageDebugSpells()
         for _, player in pairs(players) do
             local character = player[1]
             if enableDebugSpells then
-                if Osi.HasPassive(character, 'UnlockAlliesExtraSpells') == 1 then
-                    Osi.RemovePassive(character, 'UnlockAlliesExtraSpells')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS) == 1 then
+                    Osi.RemovePassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS)
                 end
-                if Osi.HasPassive(character, 'UnlockAlliesExtraSpells_ALT') == 0 then
-                    Osi.AddPassive(character, 'UnlockAlliesExtraSpells_ALT')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT) == 0 then
+                    Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT)
                 end
             else
-                if Osi.HasPassive(character, 'UnlockAlliesExtraSpells_ALT') == 1 then
-                    Osi.RemovePassive(character, 'UnlockAlliesExtraSpells_ALT')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT) == 1 then
+                    Osi.RemovePassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT)
                 end
-                if Osi.HasPassive(character, 'UnlockAlliesExtraSpells') == 0 then
-                    Osi.AddPassive(character, 'UnlockAlliesExtraSpells')
+                if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS) == 0 then
+                    Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS)
                 end
             end
         end
@@ -208,11 +317,11 @@ local function ManageDebugSpells()
         local players = Osi.DB_PartOfTheTeam:Get(nil)
         for _, player in pairs(players) do
             local character = player[1]
-            if Osi.HasPassive(character, 'UnlockAlliesExtraSpells') == 0 then
-                Osi.AddPassive(character, 'UnlockAlliesExtraSpells')
+            if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS) == 0 then
+                Osi.AddPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS)
             end
-            if Osi.HasPassive(character, 'UnlockAlliesExtraSpells_ALT') == 1 then
-                Osi.RemovePassive(character, 'UnlockAlliesExtraSpells_ALT')
+            if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT) == 1 then
+                Osi.RemovePassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS_ALT)
             end
         end
     end
@@ -227,13 +336,13 @@ local function CheckAndGivePassiveToPlayers()
     for _, player in pairs(players) do
         local character = player[1]
         if Osi.IsPlayer(character) == 1 then
-            if Osi.HasPassive(character, 'GiveAlliesSpell') == 0 then
-                Osi.AddPassive(character, 'GiveAlliesSpell')
-                Ext.Utils.Print("Given 'GiveAlliesSpell' to: " .. character)
+            if Osi.HasPassive(character, PASSIVE.GIVE_ALLIES_SPELL) == 0 then
+                Osi.AddPassive(character, PASSIVE.GIVE_ALLIES_SPELL)
+                Ext.Utils.Print("Given '" .. PASSIVE.GIVE_ALLIES_SPELL .. "' to: " .. character)
             end
-            if Osi.HasPassive(character, 'AlliesToggleNPC') == 0 then
-                Osi.AddPassive(character, 'AlliesToggleNPC')
-                Ext.Utils.Print("Given 'AlliesToggleNPC' to: " .. character)
+            if Osi.HasPassive(character, PASSIVE.ALLIES_TOGGLE_NPC) == 0 then
+                Osi.AddPassive(character, PASSIVE.ALLIES_TOGGLE_NPC)
+                Ext.Utils.Print("Given '" .. PASSIVE.ALLIES_TOGGLE_NPC .. "' to: " .. character)
             end
         end
     end
@@ -274,7 +383,7 @@ Ext.Osiris.RegisterListener("CharacterLeftParty", 1, "after", function(character
     if character then
         local isInCombat = Osi.IsInCombat(character)
         if isInCombat == 0 then
-            Osi.ApplyStatus(character, "AI_CANCEL", 0)
+            Osi.ApplyStatus(character, STATUS.AI_CANCEL, 0)
         end
     end
 end)
@@ -311,71 +420,71 @@ end
 ----------------------------------------------------------------------------------------------
 -- List of AI statuses to track for CurrentAllies
 local aiStatuses = {
-    "AI_ALLIES_MELEE_Controller",
-    "AI_ALLIES_RANGED_Controller",
-    "AI_ALLIES_HEALER_MELEE_Controller",
-    "AI_ALLIES_HEALER_RANGED_Controller",
-    "AI_ALLIES_MAGE_MELEE_Controller",
-    "AI_ALLIES_MAGE_RANGED_Controller",
-    "AI_ALLIES_GENERAL_Controller",
-    "AI_ALLIES_TRICKSTER_Controller",
-    "AI_CONTROLLED",
-    "AI_ALLIES_CUSTOM_Controller",
-    "AI_ALLIES_CUSTOM_Controller_2",
-    "AI_ALLIES_CUSTOM_Controller_3",
-    "AI_ALLIES_CUSTOM_Controller_4",
-    "AI_ALLIES_THROWER_CONTROLLER",
-    "AI_ALLIES_DEFAULT_Controller"
+    STATUS.MELEE_CONTROLLER,
+    STATUS.RANGED_CONTROLLER,
+    STATUS.HEALER_MELEE_CONTROLLER,
+    STATUS.HEALER_RANGED_CONTROLLER,
+    STATUS.MAGE_MELEE_CONTROLLER,
+    STATUS.MAGE_RANGED_CONTROLLER,
+    STATUS.GENERAL_CONTROLLER,
+    STATUS.TRICKSTER_CONTROLLER,
+    STATUS.AI_CONTROLLED,
+    STATUS.CUSTOM_CONTROLLER,
+    STATUS.CUSTOM_CONTROLLER_2,
+    STATUS.CUSTOM_CONTROLLER_3,
+    STATUS.CUSTOM_CONTROLLER_4,
+    STATUS.THROWER_CONTROLLER,
+    STATUS.DEFAULT_CONTROLLER
 }
 
 -- List of all combat statuses
 local aiCombatStatuses = {
-    'AI_ALLIES_MELEE',
-    'AI_ALLIES_RANGED',
-    'AI_ALLIES_HEALER_MELEE',
-    'AI_ALLIES_HEALER_RANGED',
-    'AI_ALLIES_MAGE_MELEE',
-    'AI_ALLIES_MAGE_RANGED',
-    'AI_ALLIES_GENERAL',
-    'AI_ALLIES_CUSTOM',
-    'AI_ALLIES_CUSTOM_2',
-    'AI_ALLIES_CUSTOM_3',
-    'AI_ALLIES_CUSTOM_4',
-    'AI_ALLIES_TRICKSTER',
-    'AI_ALLIES_THROWER',
-    'AI_ALLIES_DEFAULT',
-    'AI_ALLIES_MELEE_NPC',
-    'AI_ALLIES_RANGED_NPC',
-    'AI_ALLIES_HEALER_MELEE_NPC',
-    'AI_ALLIES_HEALER_RANGED_NPC',
-    'AI_ALLIES_MAGE_MELEE_NPC',
-    'AI_ALLIES_MAGE_RANGED_NPC',
-    'AI_ALLIES_GENERAL_NPC',
-    'AI_ALLIES_CUSTOM_NPC',
-    'AI_ALLIES_CUSTOM_2_NPC',
-    'AI_ALLIES_CUSTOM_3_NPC',
-    'AI_ALLIES_CUSTOM_4_NPC',
-    'AI_ALLIES_TRICKSTER_NPC',
-    'AI_ALLIES_THROWER_NPC',
-    'AI_ALLIES_DEFAULT_NPC'
+    STATUS.MELEE,
+    STATUS.RANGED,
+    STATUS.HEALER_MELEE,
+    STATUS.HEALER_RANGED,
+    STATUS.MAGE_MELEE,
+    STATUS.MAGE_RANGED,
+    STATUS.GENERAL,
+    STATUS.CUSTOM,
+    STATUS.CUSTOM_2,
+    STATUS.CUSTOM_3,
+    STATUS.CUSTOM_4,
+    STATUS.TRICKSTER,
+    STATUS.THROWER,
+    STATUS.DEFAULT,
+    STATUS.MELEE_NPC,
+    STATUS.RANGED_NPC,
+    STATUS.HEALER_MELEE_NPC,
+    STATUS.HEALER_RANGED_NPC,
+    STATUS.MAGE_MELEE_NPC,
+    STATUS.MAGE_RANGED_NPC,
+    STATUS.GENERAL_NPC,
+    STATUS.CUSTOM_NPC,
+    STATUS.CUSTOM_2_NPC,
+    STATUS.CUSTOM_3_NPC,
+    STATUS.CUSTOM_4_NPC,
+    STATUS.TRICKSTER_NPC,
+    STATUS.THROWER_NPC,
+    STATUS.DEFAULT_NPC
 }
 
 -- List of NPC statuses
 local NPCStatuses = {
-    'AI_ALLIES_MELEE_NPC',
-    'AI_ALLIES_RANGED_NPC',
-    'AI_ALLIES_HEALER_MELEE_NPC',
-    'AI_ALLIES_HEALER_RANGED_NPC',
-    'AI_ALLIES_MAGE_MELEE_NPC',
-    'AI_ALLIES_MAGE_RANGED_NPC',
-    'AI_ALLIES_GENERAL_NPC',
-    'AI_ALLIES_CUSTOM_NPC',
-    'AI_ALLIES_CUSTOM_2_NPC',
-    'AI_ALLIES_CUSTOM_3_NPC',
-    'AI_ALLIES_CUSTOM_4_NPC',
-    'AI_ALLIES_TRICKSTER_NPC',
-    'AI_ALLIES_THROWER_NPC',
-    'AI_ALLIES_DEFAULT_NPC'
+    STATUS.MELEE_NPC,
+    STATUS.RANGED_NPC,
+    STATUS.HEALER_MELEE_NPC,
+    STATUS.HEALER_RANGED_NPC,
+    STATUS.MAGE_MELEE_NPC,
+    STATUS.MAGE_RANGED_NPC,
+    STATUS.GENERAL_NPC,
+    STATUS.CUSTOM_NPC,
+    STATUS.CUSTOM_2_NPC,
+    STATUS.CUSTOM_3_NPC,
+    STATUS.CUSTOM_4_NPC,
+    STATUS.TRICKSTER_NPC,
+    STATUS.THROWER_NPC,
+    STATUS.DEFAULT_NPC
 }
 ---------------------------------------------------------------------------------------------
 -- Check status helper
@@ -456,10 +565,10 @@ end
 
 -- Add to CurrentAllies list or deny
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
-    if status == 'ToggleIsNPC' and Osi.IsPartyFollower(object) == 1 then
+    if status == STATUS.TOGGLE_IS_NPC and Osi.IsPartyFollower(object) == 1 then
         local hostCharacter = Osi.GetHostCharacter()
-        Osi.ApplyStatus(object, "ALLIES_WARNING", 0, 0, hostCharacter)
-        Osi.TogglePassive(object, 'AlliesToggleNPC')
+        Osi.ApplyStatus(object, STATUS.ALLIES_WARNING, 0, 0, hostCharacter)
+        Osi.TogglePassive(object, PASSIVE.ALLIES_TOGGLE_NPC)
         Osi.ShowNotification(hostCharacter, GetNextWarningMessage())
         Ext.Utils.Print("Not enabling NPC toggle, character is a party follower: " .. object)
     elseif isControllerStatus(status) and Osi.IsPartyFollower(object) == 0 then
@@ -529,7 +638,7 @@ end)
 
 -- Listener for StatusApplied to remove a specific character's UUID when AI_CANCEL status is applied
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'AI_CANCEL' then
+    if status == STATUS.AI_CANCEL then
         local uuid = Osi.GetUUID(object)
         RemoveFromCurrentAllies(uuid)
     end
@@ -538,7 +647,7 @@ end)
 Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     for uuid, _ in pairs(CurrentAllies) do
         if CurrentAllies[uuid] and Osi.Exists(uuid) == 1 then
-            Osi.ApplyStatus(uuid, 'AI_ALLY', -1)
+            Osi.ApplyStatus(uuid, STATUS.AI_ALLY, -1)
             --Ext.Utils.Print("Combat started, marking character as ally: " .. uuid)
         elseif CurrentAllies[uuid] and Osi.Exists(uuid) ~= 1 then
             -- Cleanup dead entities
@@ -620,21 +729,21 @@ local function UpdateFollowForAll()
 end
 
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'ALLIES_MINDCONTROL' then
+    if status == STATUS.ALLIES_MINDCONTROL then
         Osi.PROC_StopFollow(object)
         UpdateMindControlStatus(object, true)
         UpdateFollowingBehavior(object)
-    elseif status == 'ALLIES_ORDER_FOLLOW' then
+    elseif status == STATUS.ALLIES_ORDER_FOLLOW then
         UpdateFollowForAll()
     end
 end)
 
 Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'ALLIES_MINDCONTROL' then
+    if status == STATUS.ALLIES_MINDCONTROL then
         UpdateMindControlStatus(object, nil)
         Osi.PROC_StopFollow(object)
-        if Osi.HasActiveStatus(object, 'AI_ALLIES_POSSESSED') == 1 then
-            Osi.RemoveStatus(object, 'AI_ALLIES_POSSESSED')
+        if Osi.HasActiveStatus(object, STATUS.AI_ALLIES_POSSESSED) == 1 then
+            Osi.RemoveStatus(object, STATUS.AI_ALLIES_POSSESSED)
             Ext.Utils.Print("Removed Possessed status from: " .. object)
         end
     elseif status == 'ALLIES_ORDER_FOLLOW' then
@@ -643,7 +752,7 @@ Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (object, statu
 end)
 
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, target, spellName, _, _, _, _)
-    if spellName == 'Target_Allies_C_Order_Teleport' then
+    if spellName == SPELL.MINDCONTROL_TELEPORT then
         for character, _ in pairs(charactersUnderMindControl) do
             TeleportCharacterToPlayer(character, true)
         end
@@ -686,20 +795,20 @@ end)
 ---------------------------------------------------------------------
 -- Define the mapping of controller buffs to status buffs
 local controllerToStatusTranslator = {
-    AI_ALLIES_MELEE_Controller = 'AI_ALLIES_MELEE',
-    AI_ALLIES_RANGED_Controller = 'AI_ALLIES_RANGED',
-    AI_ALLIES_HEALER_MELEE_Controller = 'AI_ALLIES_HEALER_MELEE',
-    AI_ALLIES_HEALER_RANGED_Controller = 'AI_ALLIES_HEALER_RANGED',
-    AI_ALLIES_MAGE_MELEE_Controller = 'AI_ALLIES_MAGE_MELEE',
-    AI_ALLIES_MAGE_RANGED_Controller = 'AI_ALLIES_MAGE_RANGED',
-    AI_ALLIES_GENERAL_Controller = 'AI_ALLIES_GENERAL',
-    AI_ALLIES_CUSTOM_Controller = 'AI_ALLIES_CUSTOM',
-    AI_ALLIES_CUSTOM_Controller_2 = 'AI_ALLIES_CUSTOM_2',
-    AI_ALLIES_CUSTOM_Controller_3 = 'AI_ALLIES_CUSTOM_3',
-    AI_ALLIES_CUSTOM_Controller_4 = 'AI_ALLIES_CUSTOM_4',
-    AI_ALLIES_THROWER_CONTROLLER = 'AI_ALLIES_THROWER',
-    AI_ALLIES_DEFAULT_Controller = 'AI_ALLIES_DEFAULT',
-    AI_ALLIES_TRICKSTER_Controller = 'AI_ALLIES_TRICKSTER'
+    [STATUS.MELEE_CONTROLLER] = STATUS.MELEE,
+    [STATUS.RANGED_CONTROLLER] = STATUS.RANGED,
+    [STATUS.HEALER_MELEE_CONTROLLER] = STATUS.HEALER_MELEE,
+    [STATUS.HEALER_RANGED_CONTROLLER] = STATUS.HEALER_RANGED,
+    [STATUS.MAGE_MELEE_CONTROLLER] = STATUS.MAGE_MELEE,
+    [STATUS.MAGE_RANGED_CONTROLLER] = STATUS.MAGE_RANGED,
+    [STATUS.GENERAL_CONTROLLER] = STATUS.GENERAL,
+    [STATUS.CUSTOM_CONTROLLER] = STATUS.CUSTOM,
+    [STATUS.CUSTOM_CONTROLLER_2] = STATUS.CUSTOM_2,
+    [STATUS.CUSTOM_CONTROLLER_3] = STATUS.CUSTOM_3,
+    [STATUS.CUSTOM_CONTROLLER_4] = STATUS.CUSTOM_4,
+    [STATUS.THROWER_CONTROLLER] = STATUS.THROWER,
+    [STATUS.DEFAULT_CONTROLLER] = STATUS.DEFAULT,
+    [STATUS.TRICKSTER_CONTROLLER] = STATUS.TRICKSTER
 }
 
 --- Apply combat AI status based on the character's controller buff
@@ -870,7 +979,7 @@ local function ApplyStatusBasedOnBuff(character)
     for controllerBuff, status in pairs(controllerToStatusTranslator) do
         local success1, hasController = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
         if success1 and hasController == 1 then
-            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, "ToggleIsNPC")
+            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, STATUS.TOGGLE_IS_NPC)
             if success2 and hasNPC == 0 then
                 local applySuccess = SafeOsiCall(Osi.ApplyStatus, character, status, -1)
                 if applySuccess then
@@ -910,12 +1019,12 @@ end)
 -- AI Specific spells
 -- Mapping of original spells to their AI versions
 local spellMappings = {
-    ['Shout_ActionSurge'] = 'Shout_ActionSurge_AI',
-    ['Shout_Dash'] = 'Shout_Dash_AI',
-    ['Shout_Dash_CunningAction'] = 'Shout_Dash_CunningAction_AI',
-    ['Shout_Rage_Berserker'] = 'Shout_Rage_Berserker_AI',
-    ['Shout_Rage_Wildheart'] = 'Shout_Rage_Wildheart_AI',
-    ['Shout_Rage_WildMagic'] = 'Shout_Rage_WildMagic_AI'
+    [SPELL.ACTION_SURGE] = SPELL.ACTION_SURGE_AI,
+    [SPELL.DASH] = SPELL.DASH_AI,
+    [SPELL.DASH_CUNNING] = SPELL.DASH_CUNNING_AI,
+    [SPELL.RAGE_BERSERKER] = SPELL.RAGE_BERSERKER_AI,
+    [SPELL.RAGE_WILDHEART] = SPELL.RAGE_WILDHEART_AI,
+    [SPELL.RAGE_WILDMAGIC] = SPELL.RAGE_WILDMAGIC_AI
 }
 
 --- Add or remove AI-specific spell variants for a character
@@ -965,7 +1074,7 @@ end
 
 -- StatusApplied listener adjusted to use queue
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (character, status, causee, storyActionID)
-    if hasAnyAICombatStatus(character) and not Mods.AIAllies.modifiedCharacters[character] and Osi.HasActiveStatus(character, "ToggleIsNPC") == 0 then
+    if hasAnyAICombatStatus(character) and not Mods.AIAllies.modifiedCharacters[character] and Osi.HasActiveStatus(character, STATUS.TOGGLE_IS_NPC) == 0 then
         Mods.AIAllies.modifiedCharacters[character] = true
         table.insert(Mods.AIAllies.spellModificationQueue, character)
         if not Mods.AIAllies.currentlyProcessing then
@@ -976,7 +1085,7 @@ end)
 
 -- Listener for when 'FOR_AI_SPELLS' status is removed
 Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (character, status, causee, storyActionID)
-    if status == 'FOR_AI_SPELLS' then
+    if status == STATUS.FOR_AI_SPELLS then
         ModifyAISpells(character, false)
         Mods.AIAllies.modifiedCharacters[character] = nil
     end
@@ -1101,7 +1210,7 @@ end
 
 -- Listener for the 'C_Shout_Allies_Teleport' spell
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, target, spellName, _, _, _, _)
-    if spellName == 'C_Shout_Allies_Teleport' then
+    if spellName == SPELL.ALLIES_TELEPORT then
         TeleportAlliesToCaster(caster)
     end
 end)
@@ -1137,7 +1246,7 @@ end
 
 -- Faction Debug
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, target, spell, spellType, spellElement, storyActionID)
-    if spell == "G_Target_Allies_Faction" then
+    if spell == SPELL.FACTION_JOIN then
         local success1, casterFaction = SafeOsiCall(Osi.GetFaction, caster)
         local success2, targetFaction = SafeOsiCall(Osi.GetFaction, target)
         local hostCharacter = Osi.GetHostCharacter()
@@ -1160,7 +1269,7 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, 
 end)
 
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, target, spell, _, _, _, _)
-    if spell == "H_Target_Allies_Faction_Leave" then
+    if spell == SPELL.FACTION_LEAVE then
         local hostCharacter = Osi.GetHostCharacter()
         local originalFaction = originalFactions[hostCharacter] or "6545a015-1b3d-66a4-6a0e-6ec62065cdb7"
 
@@ -1173,20 +1282,20 @@ end)
 ------------------------------------------------------------------------------------------------
 -- for Debug spells
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'MARK_NPC' then
+    if status == STATUS.MARK_NPC then
         Osi.MakeNPC(object)
     end
 end)
 
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'MARK_PLAYER' then
+    if status == STATUS.MARK_PLAYER then
         Osi.MakePlayer(object)
     end
 end)
 
 -- Listener function for UsingSpellOnTarget
 function OnUsingSpellOnTarget(caster, target, spell, spellType, spellElement, storyActionID)
-    if spell == "I_Target_Allies_Check_Archetype" then
+    if spell == SPELL.CHECK_ARCHETYPE then
         local activeArchetype = Osi.GetActiveArchetype(target)
         local baseArchetype = Osi.GetBaseArchetype(target)
         Ext.Utils.Print("Target: " .. target)
@@ -1296,7 +1405,7 @@ end)
 ------------------------------------------------------------------------------------------------
 -- For wildshape - delay removal to give AI time to process
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
-    if status == 'FORCE_USE_MOST' or status == 'FORCE_USE_MORE' then
+    if status == STATUS.FORCE_USE_MOST or status == STATUS.FORCE_USE_MORE then
         -- Delay removal to allow AI to process the status
         local wildshapeTimer = "WildshapeForceRemove_" .. object .. "_" .. status
         Mods.AIAllies.characterTimers[wildshapeTimer] = {object = object, status = status}
