@@ -52,12 +52,15 @@ end
 --- @param entity string Entity UUID
 --- @param mode string Mode ("AGGRESSIVE", "DEFENSIVE", "SUPPORT", or nil to clear)
 function AdvancedFeatures.SetAggressionMode(entity, mode)
-    if not Shared.CachedExists(entity) then return end
+    if not entity or not Shared.CachedExists(entity) then
+        Shared.DebugLog("AdvancedFeatures", "[ERROR] Invalid entity in SetAggressionMode")
+        return
+    end
     
     -- Remove all aggression modes
-    Osi.RemoveStatus(entity, Shared.STATUS.AGGRESSIVE_MODE)
-    Osi.RemoveStatus(entity, Shared.STATUS.DEFENSIVE_MODE)
-    Osi.RemoveStatus(entity, Shared.STATUS.SUPPORT_MODE)
+    Shared.SafeOsiCall(Osi.RemoveStatus, entity, Shared.STATUS.AGGRESSIVE_MODE)
+    Shared.SafeOsiCall(Osi.RemoveStatus, entity, Shared.STATUS.DEFENSIVE_MODE)
+    Shared.SafeOsiCall(Osi.RemoveStatus, entity, Shared.STATUS.SUPPORT_MODE)
     
     -- Apply new mode if specified
     local statusMap = {
@@ -66,10 +69,20 @@ function AdvancedFeatures.SetAggressionMode(entity, mode)
         SUPPORT = Shared.STATUS.SUPPORT_MODE
     }
     
-    local status = statusMap[mode]
-    if status then
-        Osi.ApplyStatus(entity, status, -1, 0, entity)
-        Shared.DebugLog("AdvancedFeatures", string.format("Set %s to %s mode", entity, mode))
+    if mode and type(mode) == "string" then
+        local status = statusMap[mode]
+        if status then
+            local success = Shared.SafeOsiCall(Osi.ApplyStatus, entity, status, -1, 0, entity)
+            if success then
+                Shared.DebugLog("AdvancedFeatures", string.format("[MODE] Set %s to %s mode", entity, mode))
+            else
+                Shared.DebugLog("AdvancedFeatures", string.format("[ERROR] Failed to set %s mode for %s", mode, entity))
+            end
+        else
+            Shared.DebugLog("AdvancedFeatures", "[WARNING] Unknown aggression mode: " .. tostring(mode))
+        end
+    else
+        Shared.DebugLog("AdvancedFeatures", "[MODE] Cleared aggression mode for " .. entity)
     end
 end
 
@@ -77,15 +90,35 @@ end
 --- @param entity string Entity UUID
 --- @return boolean needsHealing True if health below threshold
 function AdvancedFeatures.NeedsHealing(entity)
-    if not Shared.CachedExists(entity) then return false end
-    if not AdvancedFeatures.IsAutoHealEnabled(entity) then return false end
+    if not entity or not Shared.CachedExists(entity) then
+        return false
+    end
+    
+    if not AdvancedFeatures.IsAutoHealEnabled(entity) then
+        return false
+    end
     
     local currentHP = Osi.GetHitpoints(entity)
     local maxHP = Osi.GetMaxHitpoints(entity)
     
-    if not currentHP or not maxHP or maxHP == 0 then return false end
+    -- Validate HP values
+    if not currentHP or not maxHP then
+        Shared.DebugLog("AdvancedFeatures", "[ERROR] Failed to get HP for entity " .. entity)
+        return false
+    end
+    
+    if maxHP <= 0 then
+        Shared.DebugLog("AdvancedFeatures", "[WARNING] Entity " .. entity .. " has invalid maxHP: " .. maxHP)
+        return false
+    end
     
     local healthPercent = currentHP / maxHP
+    
+    if healthPercent < 0 or healthPercent > 1 then
+        Shared.DebugLog("AdvancedFeatures", "[WARNING] Invalid health percentage for " .. entity .. ": " .. healthPercent)
+        return false
+    end
+    
     return healthPercent < Shared.CONSTANTS.AUTO_HEAL_THRESHOLD
 end
 
@@ -112,19 +145,39 @@ end
 --- This should be called on turn events
 --- @param entity string Entity UUID
 function AdvancedFeatures.ProcessAutoHeal(entity)
-    if not Shared.CachedExists(entity) then return end
-    if not AdvancedFeatures.NeedsHealing(entity) then return end
+    if not entity or not Shared.CachedExists(entity) then
+        return
+    end
+    
+    if not AdvancedFeatures.NeedsHealing(entity) then
+        return
+    end
+    
+    -- Safety check for CurrentAllies
+    if not BootstrapServer or not BootstrapServer.CurrentAllies then
+        Shared.DebugLog("AdvancedFeatures", "[ERROR] CurrentAllies not available for auto-heal")
+        return
+    end
     
     -- Find allies who can heal
+    local healersFound = 0
     for ally, _ in pairs(BootstrapServer.CurrentAllies) do
         if Shared.CachedExists(ally) and ally ~= entity then
             -- Check if ally is a healer archetype
-            if AI.hasControllerStatus(ally, "HEALER") then
-                Shared.DebugLog("AdvancedFeatures", string.format("%s needs healing, healer %s should respond", entity, ally))
-                -- Note: Actual healing is handled by AI system
-                -- This just provides visibility for debugging
+            if AI and AI.hasControllerStatus then
+                if AI.hasControllerStatus(ally, "HEALER") then
+                    healersFound = healersFound + 1
+                    Shared.DebugLog("AdvancedFeatures", string.format("[AUTO-HEAL] %s needs healing (%.0f%%), healer %s identified",
+                        entity,
+                        (Osi.GetHitpoints(entity) / Osi.GetMaxHitpoints(entity)) * 100,
+                        ally))
+                end
             end
         end
+    end
+    
+    if healersFound == 0 then
+        Shared.DebugLog("AdvancedFeatures", "[WARNING] Entity " .. entity .. " needs healing but no healers available")
     end
 end
 

@@ -48,7 +48,9 @@ local eventThrottle = {}  -- Tracks last execution time for throttled events
 --- @param entity string The entity UUID to check
 --- @return number 1 if entity exists, 0 otherwise
 function Shared.CachedExists(entity)
-    if not entity then return 0 end
+    if not entity or type(entity) ~= "string" or entity == "" then
+        return 0
+    end
     
     local currentTime = Ext.Utils.MonotonicTime()
     
@@ -63,10 +65,18 @@ function Shared.CachedExists(entity)
         return entityCache[entity]
     end
     
-    -- Cache miss - check and store result
-    local exists = Osi.Exists(entity)
-    entityCache[entity] = exists
-    return exists
+    -- Cache miss - check and store result (with error handling)
+    local success, exists = pcall(Osi.Exists, entity)
+    if not success then
+        -- Log error and return 0
+        if Shared.CONSTANTS.DEBUG_MODE then
+            Ext.Utils.Print("[ERROR] Failed to check existence for entity: " .. tostring(entity))
+        end
+        return 0
+    end
+    
+    entityCache[entity] = exists or 0
+    return exists or 0
 end
 
 --- Throttle event processing to prevent spam

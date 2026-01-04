@@ -107,22 +107,45 @@ end
 --- @param positionIndex number Position index in formation (0-based)
 --- @return number|nil, number|nil, number|nil x, y, z coordinates or nil if error
 function Formations.CalculateFormationPosition(entity, leader, formationType, positionIndex)
-    if not Shared.CachedExists(entity) or not Shared.CachedExists(leader) then
+    -- Validate entities exist
+    if not entity or not Shared.CachedExists(entity) then
+        Shared.DebugLog("Formation", "[ERROR] Invalid entity in CalculateFormationPosition")
         return nil, nil, nil
     end
     
+    if not leader or not Shared.CachedExists(leader) then
+        Shared.DebugLog("Formation", "[ERROR] Invalid leader in CalculateFormationPosition for entity " .. entity)
+        return nil, nil, nil
+    end
+    
+    -- Validate formation type
     local formation = FORMATION_TYPES[formationType]
-    if not formation then return nil, nil, nil end
+    if not formation then
+        Shared.DebugLog("Formation", "[ERROR] Invalid formation type: " .. tostring(formationType))
+        return nil, nil, nil
+    end
     
-    -- Get leader position
+    -- Get leader position with error handling
     local leaderX, leaderY, leaderZ = Osi.GetPosition(leader)
-    if not leaderX then return nil, nil, nil end
+    if not leaderX or not leaderY or not leaderZ then
+        Shared.DebugLog("Formation", "[ERROR] Failed to get position for leader " .. leader)
+        return nil, nil, nil
+    end
     
-    -- Get position offset
+    -- Validate position index
+    if type(positionIndex) ~= "number" or positionIndex < 0 then
+        Shared.DebugLog("Formation", "[WARNING] Invalid position index " .. tostring(positionIndex) .. ", using 0")
+        positionIndex = 0
+    end
+    
+    -- Get position offset with fallback
     local offset = formation.positions[positionIndex + 1] or formation.positions[1]
-    if not offset then return nil, nil, nil end
+    if not offset or not offset.x or not offset.y then
+        Shared.DebugLog("Formation", "[ERROR] Invalid offset data for position " .. positionIndex)
+        return nil, nil, nil
+    end
     
-    -- Calculate target position (simple offset for now)
+    -- Calculate target position
     local targetX = leaderX + (offset.x * Shared.CONSTANTS.FORMATION_DISTANCE)
     local targetY = leaderY + (offset.y * Shared.CONSTANTS.FORMATION_DISTANCE)
     local targetZ = leaderZ
@@ -133,19 +156,27 @@ end
 --- Update formation positions for all allies
 --- This should be called periodically (e.g., every 2 seconds)
 function Formations.UpdateFormations()
+    -- Safety check for CurrentAllies
+    if not BootstrapServer or not BootstrapServer.CurrentAllies then
+        Shared.DebugLog("Formation", "[ERROR] CurrentAllies not available for formation update")
+        return
+    end
+    
     -- Group allies by formation type and leader
     local formationGroups = {}
+    local allyCount = 0
     
     -- Iterate through all allies
     for ally, _ in pairs(BootstrapServer.CurrentAllies) do
         if Shared.CachedExists(ally) then
+            allyCount = allyCount + 1
             local formationType = Formations.GetFormationType(ally)
             
             -- Skip scattered formation and allies without formation
             if formationType and formationType ~= "SCATTERED" then
                 local leader = Formations.GetFormationLeader(ally)
                 
-                if leader then
+                if leader and Shared.CachedExists(leader) then
                     local groupKey = leader .. "_" .. formationType
                     formationGroups[groupKey] = formationGroups[groupKey] or {
                         leader = leader,
@@ -154,32 +185,42 @@ function Formations.UpdateFormations()
                     }
                     
                     table.insert(formationGroups[groupKey].members, ally)
+                else
+                    Shared.DebugLog("Formation", "[WARNING] No valid leader found for ally " .. ally)
                 end
             end
         end
     end
     
     -- Apply formation positions
+    local positionsUpdated = 0
     for groupKey, group in pairs(formationGroups) do
-        for index, ally in ipairs(group.members) do
-            local x, y, z = Formations.CalculateFormationPosition(
-                ally,
-                group.leader,
-                group.formationType,
-                index - 1
-            )
-            
-            -- Store ideal position (actual movement controlled by AI)
-            if x and y and z then
-                formationData[ally] = {
-                    targetX = x,
-                    targetY = y,
-                    targetZ = z,
-                    leader = group.leader,
-                    formationType = group.formationType
-                }
+        if #group.members > 0 then
+            for index, ally in ipairs(group.members) do
+                local x, y, z = Formations.CalculateFormationPosition(
+                    ally,
+                    group.leader,
+                    group.formationType,
+                    index - 1
+                )
+                
+                -- Store ideal position (actual movement controlled by AI)
+                if x and y and z then
+                    formationData[ally] = {
+                        targetX = x,
+                        targetY = y,
+                        targetZ = z,
+                        leader = group.leader,
+                        formationType = group.formationType
+                    }
+                    positionsUpdated = positionsUpdated + 1
+                end
             end
         end
+    end
+    
+    if positionsUpdated > 0 then
+        Shared.DebugLog("Formation", "Updated " .. positionsUpdated .. " formation positions for " .. allyCount .. " allies")
     end
 end
 

@@ -91,14 +91,26 @@ end
 --- @param character string The character to teleport
 --- @param alwaysTeleport boolean If true, always teleport; if false, only if follow order active
 function Features.TeleportCharacterToPlayer(character, alwaysTeleport)
-    if not character or CachedExists(character) ~= 1 then
+    -- Validate character
+    if not character then
+        DebugLog("[ERROR] TeleportCharacterToPlayer called with nil character", "TELEPORT")
+        return
+    end
+    
+    if CachedExists(character) ~= 1 then
+        DebugLog("[ERROR] Character does not exist: " .. tostring(character), "TELEPORT")
         return
     end
     
     -- Determine which player to teleport to
     local playerCharacter = Shared.GetPlayerForEntity(character)
-    if not playerCharacter or CachedExists(playerCharacter) ~= 1 then
-        Ext.Utils.Print("[WARNING] Cannot teleport - no valid player found")
+    if not playerCharacter then
+        DebugLog("[WARNING] Cannot teleport " .. character .. " - no valid player found", "TELEPORT")
+        return
+    end
+    
+    if CachedExists(playerCharacter) ~= 1 then
+        DebugLog("[ERROR] Player character no longer exists: " .. playerCharacter, "TELEPORT")
         return
     end
     
@@ -106,24 +118,54 @@ function Features.TeleportCharacterToPlayer(character, alwaysTeleport)
     if alwaysTeleport or canFollow then
         local success = SafeOsiCall(Osi.TeleportTo, character, playerCharacter)
         if success then
-            DebugLog("Teleported " .. character .. " to player: " .. playerCharacter, "TELEPORT")
+            DebugLog("[TELEPORT] Character " .. character .. " teleported to player " .. playerCharacter, "TELEPORT")
             if canFollow then
                 SafeOsiCall(Osi.PROC_Follow, character, playerCharacter)
             end
+        else
+            DebugLog("[ERROR] Failed to teleport character " .. character .. " to player", "TELEPORT")
         end
     end
 end
 
 --- Teleport all allies to the caster (multiplayer-aware)
 function Features.TeleportAlliesToCaster(caster, CurrentAllies)
+    -- Validate caster
+    if not caster then
+        DebugLog("[ERROR] TeleportAlliesToCaster called with nil caster", "TELEPORT")
+        return
+    end
+    
+    if CachedExists(caster) ~= 1 then
+        DebugLog("[ERROR] Caster does not exist: " .. tostring(caster), "TELEPORT")
+        return
+    end
+    
+    -- Validate CurrentAllies table
+    if not CurrentAllies or type(CurrentAllies) ~= "table" then
+        DebugLog("[ERROR] Invalid CurrentAllies table", "TELEPORT")
+        return
+    end
+    
+    local teleportCount = 0
+    local errorCount = 0
+    
     -- Teleport to the caster's location
     for uuid, _ in pairs(CurrentAllies) do
-        if CurrentAllies[uuid] then
+        if CurrentAllies[uuid] and CachedExists(uuid) == 1 then
             local success = SafeOsiCall(Osi.TeleportTo, uuid, caster, "", 1, 1, 1, 0, 1)
             if success then
-                DebugLog("Teleporting ally: " .. uuid .. " to caster: " .. caster, "TELEPORT")
+                teleportCount = teleportCount + 1
+                DebugLog("[TELEPORT] Ally " .. uuid .. " teleported to caster", "TELEPORT")
+            else
+                errorCount = errorCount + 1
+                DebugLog("[ERROR] Failed to teleport ally " .. uuid, "TELEPORT")
             end
         end
+    end
+    
+    if teleportCount > 0 or errorCount > 0 then
+        DebugLog("[TELEPORT] Completed: " .. teleportCount .. " teleported, " .. errorCount .. " errors", "TELEPORT")
     end
 end
 

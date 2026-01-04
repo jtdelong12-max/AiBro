@@ -164,10 +164,22 @@ function AI.isControllerStatus(status)
     return false
 end
 
-function AI.hasControllerStatus(character)
-    for _, brainStatus in ipairs(AI.aiStatuses) do
-        if Osi.HasActiveStatus(character, brainStatus) == 1 then
-            return true
+--- Check if character has a controller status with optional brain type filter
+--- @param character string Character UUID
+--- @param brainType string|nil Optional brain type to filter (e.g., "HEALER")
+--- @return boolean True if character has matching controller status
+function AI.hasControllerStatus(character, brainType)
+    if not character or not CachedExists(character) then
+        return false
+    end
+    
+    for _, status in ipairs(AI.aiStatuses) do
+        -- If brainType specified, only check matching statuses
+        if not brainType or string.find(status, brainType) then
+            local success, hasStatus = SafeOsiCall(Osi.HasActiveStatus, character, status)
+            if success and hasStatus == 1 then
+                return true
+            end
         end
     end
     return false
@@ -190,6 +202,11 @@ end
 --- @param character string The character UUID
 --- @return string|nil The status that was applied, or nil if none
 function AI.ApplyStatusBasedOnBuff(character)
+    if not character or not CachedExists(character) then
+        DebugLog("[ERROR] Invalid character in ApplyStatusBasedOnBuff", "STATUS")
+        return nil
+    end
+    
     for controllerBuff, status in pairs(AI.controllerToStatusTranslator) do
         local success1, hasController = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
         if success1 and hasController == 1 then
@@ -197,7 +214,10 @@ function AI.ApplyStatusBasedOnBuff(character)
             if success2 and hasNPC == 0 then
                 local success3 = SafeOsiCall(Osi.ApplyStatus, character, status, -1, 1, character)
                 if success3 then
-                    DebugLog("Applied " .. status .. " to " .. character, "STATUS")
+                    DebugLog("[STATUS] Applied " .. status .. " to " .. character, "STATUS")
+                else
+                    DebugLog("[ERROR] Failed to apply status " .. status .. " to " .. character, "STATUS")
+                end
                     return status
                 end
             end

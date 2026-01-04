@@ -42,50 +42,90 @@ local function HandleDialogStarted(dialog, instanceID)
 end
 
 local function HandleDialogActorJoined(instanceID, actor, CurrentAllies)
+    -- Validate actor exists
+    if not actor then
+        DebugLog("[ERROR] HandleDialogActorJoined called with nil actor", "DIALOG")
+        return
+    end
+    
     local actorUuid = Osi.GetUUID(actor)
-    if not actorUuid or CachedExists(actor) ~= 1 then
+    if not actorUuid then
+        DebugLog("[ERROR] Failed to get UUID for actor: " .. tostring(actor), "DIALOG")
+        return
+    end
+    
+    if not CachedExists(actor) then
+        DebugLog("[ERROR] Actor does not exist: " .. actorUuid, "DIALOG")
         return
     end
     
     if instanceID == relevantDialogInstance and IsCurrentAlly(actorUuid, CurrentAllies) and HasRelevantStatus(actor) then
         local success, originalFaction = SafeOsiCall(Osi.GetFaction, actor)
-        if success then
+        if success and originalFaction then
             transformedCompanions[actorUuid] = {
                 wasNPC = true,
-                faction = originalFaction
+                faction = originalFaction,
+                actorName = Osi.GetDisplayName(actor) or "Unknown"
             }
             
             local makePlayerSuccess = SafeOsiCall(Osi.MakePlayer, actor)
             if makePlayerSuccess then
-                DebugLog("Temporarily turned " .. actor .. " into a player for dialog instance " .. tostring(instanceID), "DIALOG")
+                DebugLog("[DIALOG] Temporarily turned " .. transformedCompanions[actorUuid].actorName .. " (" .. actorUuid .. ") into player for dialog", "DIALOG")
+            else
+                DebugLog("[ERROR] Failed to convert " .. actorUuid .. " to player for dialog", "DIALOG")
+                transformedCompanions[actorUuid] = nil
             end
+        else
+            DebugLog("[ERROR] Failed to get faction for actor " .. actorUuid .. " before dialog conversion", "DIALOG")
         end
     end
 end
 
 local function HandleDialogEnded(dialog, instanceID)
     if instanceID == relevantDialogInstance then
+        local revertCount = 0
+        local errorCount = 0
+        
         for actorUuid, data in pairs(transformedCompanions) do
-            if CachedExists(actorUuid) ~= 1 then
-                Ext.Utils.Print("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion")
+            if not CachedExists(actorUuid) then
+                DebugLog("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion", "DIALOG")
+                errorCount = errorCount + 1
             else
-                local success2, inCombat = SafeOsiCall(Osi.IsInCombat, actorUuid)
-                if success2 and inCombat == 0 then
-                    DebugLog("Character " .. actorUuid .. " is not in combat, remaining as player character after dialog end.", "DIALOG")
+                -- Validate data structure
+                if type(data) ~= "table" then
+                    DebugLog("[ERROR] Invalid data structure for actor " .. actorUuid .. ", skipping", "DIALOG")
+                    errorCount = errorCount + 1
                 else
-                    local makeNPCSuccess = SafeOsiCall(Osi.MakeNPC, actorUuid)
-                    if makeNPCSuccess then
-                        if type(data) == "table" and data.faction then
-                            local factionSuccess = SafeOsiCall(Osi.SetFaction, actorUuid, data.faction)
-                            if factionSuccess then
-                                DebugLog("[FACTION] Restored faction for " .. actorUuid .. " to " .. data.faction, "DIALOG")
+                    local success2, inCombat = SafeOsiCall(Osi.IsInCombat, actorUuid)
+                    if success2 and inCombat == 0 then
+                        DebugLog("[DIALOG] " .. (data.actorName or actorUuid) .. " not in combat, remaining as player", "DIALOG")
+                    else
+                        -- Revert to NPC
+                        local makeNPCSuccess = SafeOsiCall(Osi.MakeNPC, actorUuid)
+                        if makeNPCSuccess then
+                            revertCount = revertCount + 1
+                            
+                            -- Restore faction
+                            if data.faction then
+                                local factionSuccess = SafeOsiCall(Osi.SetFaction, actorUuid, data.faction)
+                                if factionSuccess then
+                                    DebugLog("[DIALOG] Restored " .. (data.actorName or actorUuid) .. " to NPC with faction " .. data.faction, "DIALOG")
+                                else
+                                    DebugLog("[WARNING] Failed to restore faction " .. data.faction .. " for " .. actorUuid, "DIALOG")
+                                end
+                            else
+                                DebugLog("[WARNING] No faction data stored for " .. actorUuid .. ", using default", "DIALOG")
                             end
+                        else
+                            DebugLog("[ERROR] Failed to revert " .. actorUuid .. " to NPC after dialog", "DIALOG")
+                            errorCount = errorCount + 1
                         end
-                        DebugLog("Reverted " .. actorUuid .. " back to NPC after dialog end in instance " .. tostring(instanceID), "DIALOG")
                     end
                 end
             end
         end
+        
+        DebugLog("[DIALOG] Dialog ended - Reverted " .. revertCount .. " allies, " .. errorCount .. " errors", "DIALOG")
         transformedCompanions = {}
         relevantDialogInstance = nil
     end
