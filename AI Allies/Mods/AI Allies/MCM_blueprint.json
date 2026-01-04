@@ -72,6 +72,33 @@
               "Description": "Block spell usage depending on the character's health percentage."
             }
           ]
+        },
+        {
+          "SectionId": "advancedFeatures",
+          "SectionName": "Advanced AI Features",
+          "Settings": [
+            {
+              "Id": "enableFormations",
+              "Name": "Enable Formation Positioning",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Enable tactical formation positioning for AI allies (Frontline, Midline, Backline, Scattered)."
+            },
+            {
+              "Id": "enableAutoHeal",
+              "Name": "Enable Auto-Heal System",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "AI healers automatically respond when allies fall below 50% health."
+            },
+            {
+              "Id": "enableAggressionModes",
+              "Name": "Enable Aggression Modes",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Enable AI aggression control (Aggressive, Defensive, Support modes)."
+            }
+          ]
         }
       ]
     }

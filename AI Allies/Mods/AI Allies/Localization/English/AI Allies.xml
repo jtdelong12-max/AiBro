@@ -120,5 +120,13 @@
 	<content contentuid="3279c93e-46ec-4cf9-99d6-824a532f2a75" version="1">Clears the target's Swarm Group</content>
 	<content contentuid="d2dc3a3d-353e-40e2-8b49-0b72ba0d89aa" version="1">Use a bonus action to mark a target for your allies as a priority, your allies will then proceed to bully this target for 3 turns. Your allies will also get a roll bonus to attack of 1d4-1 against this target.</content>
 	<content contentuid="0ffcf642-4b47-4fe9-a7f3-ace28a991e47" version="1">Use a bonus action to mark a target for your allies as a low priority for 3 turns, your allies will try to do absolutely anything else but target this target unless there's nothing else to do. Targets are afflicted with a -1d4+1 penalty to attack rolls against your allies.</content>
+	<content contentuid="a1b2c3d4-e5f6-7890-ab12-cd34ef567890" version="1">Support Archetype</content>
+	<content contentuid="e5f6a7b8-c9d0-1234-ef56-ab78cd901234" version="1">Focuses on buffing and healing allies. Prefers to stay at range and use support spells. Avoids direct combat unless necessary.</content>
+	<content contentuid="b2c3d4e5-f6a7-8901-bc23-de45fa678901" version="1">Scout Archetype</content>
+	<content contentuid="f6a7b8c9-d0e1-2345-fa67-bc89de012345" version="1">Highly mobile and prefers ranged attacks. Focuses on positioning, scouting, and hit-and-run tactics. Uses mobility abilities frequently.</content>
+	<content contentuid="c3d4e5f6-a7b8-9012-cd34-ef56ab789012" version="1">Tank Archetype</content>
+	<content contentuid="a7b8c9d0-e1f2-3456-ab78-cd90ef123456" version="1">Focuses on defensive positioning and protecting allies. Prefers melee combat and crowd control. Uses taunts and abilities to draw enemy attention.</content>
+	<content contentuid="d4e5f6a7-b8c9-0123-de45-fa67bc890123" version="1">Controller Archetype</content>
+	<content contentuid="b8c9d0e1-f2a3-4567-bc89-de01fa234567" version="1">Specializes in crowd control and battlefield manipulation. Prefers disabling enemies and controlling their positioning. Uses debuffs and area control spells.</content>
 
 </contentList>
