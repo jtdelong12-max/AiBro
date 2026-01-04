@@ -21,9 +21,61 @@ local CONSTANTS = {
     AI_ALLY_DURATION = -1,
     FOR_AI_SPELLS_DURATION = -1,
     
+    -- Performance optimization
+    ENTITY_CACHE_REFRESH = 1000,  -- How often to refresh entity existence cache (ms)
+    EVENT_THROTTLE_DELAY = 100,    -- Minimum delay between identical event processing (ms)
+    
     -- Debug settings
     DEBUG_MODE = false  -- Set to true to enable debug logging
 }
+
+----------------------------------------------------------------------------------
+-- Performance Optimization: Entity Cache & Event Throttling
+----------------------------------------------------------------------------------
+local entityCache = {}  -- Cache for entity existence checks
+local entityCacheTimer = 0  -- Timestamp of last cache refresh
+local eventThrottle = {}  -- Tracks last execution time for throttled events
+
+--- Cached entity existence check with periodic refresh
+--- @param entity string The entity UUID to check
+--- @return number 1 if entity exists, 0 otherwise
+local function CachedExists(entity)
+    if not entity then return 0 end
+    
+    local currentTime = Ext.Utils.MonotonicTime()
+    
+    -- Refresh cache if expired
+    if currentTime - entityCacheTimer > CONSTANTS.ENTITY_CACHE_REFRESH then
+        entityCache = {}  -- Clear old cache
+        entityCacheTimer = currentTime
+    end
+    
+    -- Check cache first
+    if entityCache[entity] ~= nil then
+        return entityCache[entity]
+    end
+    
+    -- Cache miss - check and store result
+    local exists = Osi.Exists(entity)
+    entityCache[entity] = exists
+    return exists
+end
+
+--- Throttle event processing to prevent spam
+--- @param eventKey string Unique key for the event type
+--- @param callback function Function to execute if throttle allows
+--- @return boolean True if event was processed, false if throttled
+local function ThrottleEvent(eventKey, callback)
+    local currentTime = Ext.Utils.MonotonicTime()
+    local lastTime = eventThrottle[eventKey] or 0
+    
+    if currentTime - lastTime >= CONSTANTS.EVENT_THROTTLE_DELAY then
+        eventThrottle[eventKey] = currentTime
+        callback()
+        return true
+    end
+    return false
+end
 
 ----------------------------------------------------------------------------------
 -- Debug Logging System
@@ -646,10 +698,10 @@ end)
 ---------------------------------------------------------------------------------------------
 Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     for uuid, _ in pairs(CurrentAllies) do
-        if CurrentAllies[uuid] and Osi.Exists(uuid) == 1 then
+        if CurrentAllies[uuid] and CachedExists(uuid) == 1 then
             Osi.ApplyStatus(uuid, STATUS.AI_ALLY, -1)
             --Ext.Utils.Print("Combat started, marking character as ally: " .. uuid)
-        elseif CurrentAllies[uuid] and Osi.Exists(uuid) ~= 1 then
+        elseif CurrentAllies[uuid] and CachedExists(uuid) ~= 1 then
             -- Cleanup dead entities
             CurrentAllies[uuid] = nil
             Ext.Utils.Print("[CLEANUP] Removed dead entity from CurrentAllies: " .. uuid)
@@ -691,11 +743,11 @@ end
 --- @param alwaysTeleport boolean If true, always teleport; if false, only teleport if follow order is active
 local function TeleportCharacterToPlayer(character, alwaysTeleport)
     local playerCharacter = Osi.GetHostCharacter()
-    -- Add entity existence validation
+    -- Add entity existence validation (cached for performance)
     if not playerCharacter or not character then
         return
     end
-    if Osi.Exists(character) ~= 1 or Osi.Exists(playerCharacter) ~= 1 then
+    if CachedExists(character) ~= 1 or CachedExists(playerCharacter) ~= 1 then
         Ext.Utils.Print("[WARNING] Cannot teleport - entity does not exist")
         return
     end
@@ -784,7 +836,7 @@ end)
 -- Don't betray the player, ignore their crimes
 Ext.Osiris.RegisterListener("CrimeIsRegistered", 8, "after", function(victim, crimeType, crimeID, evidence, criminal1, criminal2, criminal3, criminal4)
     for uuid, _ in pairs(CurrentAllies) do
-        if CurrentAllies[uuid] and Osi.Exists(uuid) == 1 then
+        if CurrentAllies[uuid] and CachedExists(uuid) == 1 then
             Osi.CrimeIgnoreCrime(crimeID, uuid)
             Osi.CharacterIgnoreActiveCrimes(uuid)
             Osi.BlockNewCrimeReactions(uuid, 1)
@@ -992,28 +1044,32 @@ local function ApplyStatusBasedOnBuff(character)
     return nil
 end
 
--- Listener for TurnStarted event
+-- Listener for TurnStarted event (throttled for performance)
 Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(character)
-    if not hasAnyNPCStatus(character) then
-        local status = ApplyStatusBasedOnBuff(character)
-        if status then
-            Mods.AIAllies.appliedStatuses[character] = status
+    ThrottleEvent("TurnStarted_" .. character, function()
+        if not hasAnyNPCStatus(character) then
+            local status = ApplyStatusBasedOnBuff(character)
+            if status then
+                Mods.AIAllies.appliedStatuses[character] = status
+            end
         end
-    end
+    end)
 end)
 
--- Listener for TurnEnded event
+-- Listener for TurnEnded event (throttled for performance)
 Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
-    if not hasAnyNPCStatus(character) then
-        local status = Mods.AIAllies.appliedStatuses[character]
-        if status then
-            local success = SafeOsiCall(Osi.RemoveStatus, character, status, character)
-            if success then
-                DebugLog("Removed " .. status .. " from " .. character, "TURN")
+    ThrottleEvent("TurnEnded_" .. character, function()
+        if not hasAnyNPCStatus(character) then
+            local status = Mods.AIAllies.appliedStatuses[character]
+            if status then
+                local success = SafeOsiCall(Osi.RemoveStatus, character, status, character)
+                if success then
+                    DebugLog("Removed " .. status .. " from " .. character, "TURN")
+                end
+                Mods.AIAllies.appliedStatuses[character] = nil
             end
-            Mods.AIAllies.appliedStatuses[character] = nil
         end
-    end
+    end)
 end)
 ------------------------------------------------------------------------------------------
 -- AI Specific spells
@@ -1032,8 +1088,8 @@ local spellMappings = {
 --- @param character string The character UUID
 --- @param addSpell boolean True to add AI spells, false to remove them
 local function ModifyAISpells(character, addSpell)
-    -- Validate entity exists before modifying spells
-    if not character or Osi.Exists(character) ~= 1 then
+    -- Validate entity exists before modifying spells (cached for performance)
+    if not character or CachedExists(character) ~= 1 then
         Ext.Utils.Print("[WARNING] Cannot modify spells - invalid character: " .. tostring(character))
         return
     end
@@ -1098,7 +1154,7 @@ local transformedCompanions = {}
 -- Cleanup function to recover from dialog crashes
 local function CleanupDialogState()
     for actorUuid, _ in pairs(transformedCompanions) do
-        if Osi.Exists(actorUuid) == 1 and IsCurrentAlly(actorUuid) then
+        if CachedExists(actorUuid) == 1 and IsCurrentAlly(actorUuid) then
             local actor = actorUuid
             if HasRelevantStatus(actor) and Osi.IsInCombat(actor) == 1 then
                 Osi.MakeNPC(actorUuid)
@@ -1115,7 +1171,7 @@ Ext.Events.SessionLoaded:Subscribe(CleanupDialogState)
 
 local function HasRelevantStatus(character)
     for _, status in ipairs(aiCombatStatuses) do
-        if Osi.HasActiveStatus(character, status) == 1 and Osi.HasActiveStatus(character, "ToggleIsNPC") == 1 then
+        if Osi.HasActiveStatus(character, status) == 1 and Osi.HasActiveStatus(character, STATUS.TOGGLE_IS_NPC) == 1 then
             return true
         end
     end
@@ -1135,8 +1191,8 @@ Ext.Osiris.RegisterListener("DialogStarted", 2, "after", HandleDialogStarted)
 
 local function HandleDialogActorJoined(instanceID, actor)
     local actorUuid = Osi.GetUUID(actor)
-    -- Validate entity exists
-    if not actorUuid or Osi.Exists(actor) ~= 1 then
+    -- Validate entity exists (cached for performance)
+    if not actorUuid or CachedExists(actor) ~= 1 then
         return
     end
     
@@ -1164,9 +1220,8 @@ end)
 local function HandleDialogEnded(dialog, instanceID)
     if instanceID == relevantDialogInstance then
         for actorUuid, data in pairs(transformedCompanions) do
-            -- Validate entity still exists
-            local success, exists = SafeOsiCall(Osi.Exists, actorUuid)
-            if not success or exists ~= 1 then
+            -- Validate entity still exists (cached for performance)
+            if CachedExists(actorUuid) ~= 1 then
                 Ext.Utils.Print("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion")
             else
                 local success2, inCombat = SafeOsiCall(Osi.IsInCombat, actorUuid)
