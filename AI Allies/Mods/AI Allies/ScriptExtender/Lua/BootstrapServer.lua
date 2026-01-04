@@ -25,7 +25,16 @@ Ext.Events.SessionLoaded:Subscribe(InitAIControlOriginalFactions)
 
 -- Local table to keep track of the current allies
 local CurrentAllies = {}
-_G.characterTimers = _G.characterTimers or {}
+
+-- Namespace all module-specific global variables under Mods.AIAllies
+Mods.AIAllies.characterTimers = Mods.AIAllies.characterTimers or {}
+Mods.AIAllies.appliedStatuses = Mods.AIAllies.appliedStatuses or {}
+Mods.AIAllies.spellModificationTimers = Mods.AIAllies.spellModificationTimers or {}
+Mods.AIAllies.modifiedCharacters = Mods.AIAllies.modifiedCharacters or {}
+Mods.AIAllies.spellModificationQueue = Mods.AIAllies.spellModificationQueue or {}
+Mods.AIAllies.currentlyProcessing = false
+Mods.AIAllies.combatTimers = {}
+Mods.AIAllies.combatStartTimes = {}
 
 -- Initialize the CurrentAllies table from PersistentVars when the session loads
 local function InitCurrentAllies()
@@ -439,9 +448,6 @@ end
 local function IsNPCStatus(status)
     return NPCStatusSet[status] ~= nil
 end
-
--- Global table to track applied statuses to avoid duplicates
-_G.appliedStatuses = _G.appliedStatuses or {}
 ---------------------------------------------------------------------------------------------
 -- No idea why I'm doing this
 local warningMessages = {
@@ -485,18 +491,8 @@ Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status
         local uuid = Osi.GetUUID(object)
         local PFtimer = "AddToAlliesTimer_" .. uuid
         Osi.TimerLaunch(PFtimer, 1000)
-        _G.characterTimers[PFtimer] = uuid
+        Mods.AIAllies.characterTimers[PFtimer] = uuid
         Ext.Utils.Print("Started timer for " .. uuid)
-    end
-end)
-
-Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function (timer)
-    local uuid = _G.characterTimers[timer]
-    if uuid then
-        CurrentAllies[uuid] = true
-        Mods.AIAllies.PersistentVars.CurrentAllies = CurrentAllies
-        Ext.Utils.Print("Added to CurrentAllies after delay: " .. uuid)
-        _G.characterTimers[timer] = nil
     end
 end)
 
@@ -506,6 +502,37 @@ local function RemoveFromCurrentAllies(uuid)
     Mods.AIAllies.PersistentVars.CurrentAllies = CurrentAllies
     Ext.Utils.Print("Removed from CurrentAllies: " .. uuid)
 end
+
+-- Consolidated TimerFinished listener for all timer types
+Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function (timer)
+    -- Handle character addition timers
+    local uuid = Mods.AIAllies.characterTimers[timer]
+    if uuid then
+        CurrentAllies[uuid] = true
+        Mods.AIAllies.PersistentVars.CurrentAllies = CurrentAllies
+        Ext.Utils.Print("Added to CurrentAllies after delay: " .. uuid)
+        Mods.AIAllies.characterTimers[timer] = nil
+        return
+    end
+    
+    -- Handle spell modification timers
+    local callback = Mods.AIAllies.spellModificationTimers[timer]
+    if callback then
+        callback()
+        Mods.AIAllies.spellModificationTimers[timer] = nil
+        return
+    end
+    
+    -- Handle combat resume timers
+    local combatGuid = Mods.AIAllies.combatTimers[timer]
+    if combatGuid then
+        Osi.ResumeCombat(combatGuid)
+        Ext.Utils.Print("Resuming combat")
+        Mods.AIAllies.combatTimers[timer] = nil
+        Mods.AIAllies.combatStartTimes[combatGuid] = nil
+        return
+    end
+end)
 
 Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (object, status, causee, storyActionID)
     if isControllerStatus(status) then
@@ -649,32 +676,6 @@ end)
 Ext.Osiris.RegisterListener("CombatEnded", 1, "after", function (combat)
     UpdateFollowForAll()
 end)
--- ------------------------------------------------------------
--- Function to enable AI control by making the character an NPC
--- local function EnableAIControl(character)
---     local hostCharacter = Osi.GetHostCharacter()
---     local hostFaction = Osi.GetFaction(hostCharacter)
---     local characterFaction = Osi.GetFaction(character)
-    
---     if not aiControlOriginalFactions[character] then
---         aiControlOriginalFactions[character] = characterFaction
---         Mods.AIAllies.PersistentVars.aiControlOriginalFactions = aiControlOriginalFactions
---     end
---     Osi.SetFaction(character, hostFaction)
-
---     Osi.MakeNPC(character)
---     Ext.Utils.Print("AI Control Enabled for: " .. character .. " with faction set to: " .. hostFaction)
--- end
-
--- local function DisableAIControl(character)
---     Osi.MakePlayer(character)
---     Ext.Utils.Print("AI Control Disabled for: " .. character)
-    
---     if aiControlOriginalFactions[character] then
---         Osi.SetFaction(character, aiControlOriginalFactions[character])
---         Ext.Utils.Print("Restored original faction for: " .. character .. " to: " .. aiControlOriginalFactions[character])
---     end
--- end
 ---------------------------------------------------------------------
 -- Don't betray the player, ignore their crimes
 Ext.Osiris.RegisterListener("CrimeIsRegistered", 8, "after", function(victim, crimeType, crimeID, evidence, criminal1, criminal2, criminal3, criminal4)
@@ -761,15 +762,15 @@ Ext.Osiris.RegisterListener("CombatEnded", 1, "after", function (combatGuid)
             end
         end
         
-        -- Clean up any orphaned statuses from _G.appliedStatuses to prevent AI freezing
-        if _G.appliedStatuses[uuid] then
-            for _, status in ipairs(_G.appliedStatuses[uuid]) do
+        -- Clean up any orphaned statuses from appliedStatuses to prevent AI freezing
+        if Mods.AIAllies.appliedStatuses[uuid] then
+            for _, status in ipairs(Mods.AIAllies.appliedStatuses[uuid]) do
                 if Osi.HasActiveStatus(uuid, status) == 1 then
                     Osi.RemoveStatus(uuid, status)
                     Ext.Utils.Print("[CLEANUP] Removed orphaned status " .. status .. " from " .. uuid)
                 end
             end
-            _G.appliedStatuses[uuid] = nil
+            Mods.AIAllies.appliedStatuses[uuid] = nil
         end
     end
 end)
@@ -896,12 +897,6 @@ Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
 end)
 ------------------------------------------------------------------------------------------
 -- AI Specific spells
--- Function to check if the status is one of the AI_Allies statuses
-_G.spellModificationTimers = _G.spellModificationTimers or {}
-_G.modifiedCharacters = _G.modifiedCharacters or {}
-_G.spellModificationQueue = _G.spellModificationQueue or {}
-_G.currentlyProcessing = false
-
 -- Mapping of original spells to their AI versions
 local spellMappings = {
     ['Shout_ActionSurge'] = 'Shout_ActionSurge_AI',
@@ -934,35 +929,26 @@ local function ModifyAISpells(character, addSpell)
 end
 
 local function ProcessQueue()
-    if #_G.spellModificationQueue == 0 then
-        _G.currentlyProcessing = false
+    if #Mods.AIAllies.spellModificationQueue == 0 then
+        Mods.AIAllies.currentlyProcessing = false
         return
     end
 
-    _G.currentlyProcessing = true
-    local character = table.remove(_G.spellModificationQueue, 1)
+    Mods.AIAllies.currentlyProcessing = true
+    local character = table.remove(Mods.AIAllies.spellModificationQueue, 1)
     ModifyAISpells(character, true)
 
     local nextProcessTimer = "NextProcessTimer_" .. character
     Osi.TimerLaunch(nextProcessTimer, 250)
-    _G.spellModificationTimers[nextProcessTimer] = function() ProcessQueue() end
+    Mods.AIAllies.spellModificationTimers[nextProcessTimer] = function() ProcessQueue() end
 end
-
--- TimerFinished callback adjusted to handle queue processing
-Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function (timer)
-    local callback = _G.spellModificationTimers[timer]
-    if callback then
-        callback()
-        _G.spellModificationTimers[timer] = nil
-    end
-end)
 
 -- StatusApplied listener adjusted to use queue
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (character, status, causee, storyActionID)
-    if hasAnyAICombatStatus(character) and not _G.modifiedCharacters[character] and Osi.HasActiveStatus(character, "ToggleIsNPC") == 0 then
-        _G.modifiedCharacters[character] = true
-        table.insert(_G.spellModificationQueue, character)
-        if not _G.currentlyProcessing then
+    if hasAnyAICombatStatus(character) and not Mods.AIAllies.modifiedCharacters[character] and Osi.HasActiveStatus(character, "ToggleIsNPC") == 0 then
+        Mods.AIAllies.modifiedCharacters[character] = true
+        table.insert(Mods.AIAllies.spellModificationQueue, character)
+        if not Mods.AIAllies.currentlyProcessing then
             ProcessQueue()
         end
     end
@@ -972,7 +958,7 @@ end)
 Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (character, status, causee, storyActionID)
     if status == 'FOR_AI_SPELLS' then
         ModifyAISpells(character, false)
-        _G.modifiedCharacters[character] = nil
+        Mods.AIAllies.modifiedCharacters[character] = nil
     end
 end)
 -----------------------------------------------------------------------------------------------
@@ -1157,24 +1143,15 @@ end
 
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", OnUsingSpellOnTarget)
 ------------------------------------------------------------------------------------------------
--- Force
--- Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
---     if status == 'FORCE_USE' or status == 'FORCE_USE_MORE' or status == 'FORCE_USE_MOST' then
---         Osi.RemoveStatus(object, status)
---     end
--- end)
-------------------------------------------------------------------------------------------------
 -- Testing - Pause combat when it starts to give AI time to initialize 
-local combatTimers = {}
-local combatStartTimes = {}
 
-local function OnTimerFinished(InitializeTimerAI)
-    local combatGuid = combatTimers[InitializeTimerAI]
+local function OnCombatResumeTimerFinished(InitializeTimerAI)
+    local combatGuid = Mods.AIAllies.combatTimers[InitializeTimerAI]
     if combatGuid then
         Osi.ResumeCombat(combatGuid)
         Ext.Utils.Print("Resuming combat")
-        combatTimers[InitializeTimerAI] = nil
-        combatStartTimes[combatGuid] = nil
+        Mods.AIAllies.combatTimers[InitializeTimerAI] = nil
+        Mods.AIAllies.combatStartTimes[combatGuid] = nil
     end
 end
 
@@ -1182,28 +1159,24 @@ Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     Osi.PauseCombat(combatGuid)
     Ext.Utils.Print("Pausing combat to allow AI to initialize")
     local InitializeTimerAI = "ResumeCombatTimer_" .. tostring(combatGuid)
-    combatTimers[InitializeTimerAI] = combatGuid
-    combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
+    Mods.AIAllies.combatTimers[InitializeTimerAI] = combatGuid
+    Mods.AIAllies.combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
     Osi.TimerLaunch(InitializeTimerAI, 2000)
-end)
-
-Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function(InitializeTimerAI)
-    OnTimerFinished(InitializeTimerAI)
 end)
 
 -- Fallback: Force resume combat if it's been paused too long (safety mechanism)
 Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(entityGuid)
     local combatGuid = Osi.CombatGetGuidFor(entityGuid)
-    if combatGuid and combatStartTimes[combatGuid] then
-        local elapsed = Ext.Utils.MonotonicTime() - combatStartTimes[combatGuid]
+    if combatGuid and Mods.AIAllies.combatStartTimes[combatGuid] then
+        local elapsed = Ext.Utils.MonotonicTime() - Mods.AIAllies.combatStartTimes[combatGuid]
         if elapsed > 60000 then -- 60 second safety timeout
             Osi.ResumeCombat(combatGuid)
             Ext.Utils.Print("[SAFETY] Force resuming combat after timeout: " .. combatGuid)
-            combatStartTimes[combatGuid] = nil
+            Mods.AIAllies.combatStartTimes[combatGuid] = nil
             -- Clean up any related timers
-            for timer, guid in pairs(combatTimers) do
+            for timer, guid in pairs(Mods.AIAllies.combatTimers) do
                 if guid == combatGuid then
-                    combatTimers[timer] = nil
+                    Mods.AIAllies.combatTimers[timer] = nil
                 end
             end
         end
@@ -1277,11 +1250,14 @@ end)
 --     end
 -- end)
 ------------------------------------------------------------------------------------------------
--- For wildshape
+-- For wildshape - delay removal to give AI time to process
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
     if status == 'FORCE_USE_MOST' or status == 'FORCE_USE_MORE' then
-        Osi.RemoveStatus(object, status)
-        --Ext.Utils.Print("Removed status: " .. status .. " from object: " .. object)
+        -- Delay removal by 500ms to allow AI to process the status
+        local wildshapeTimer = "WildshapeForceRemove_" .. object .. "_" .. status
+        Mods.AIAllies.characterTimers[wildshapeTimer] = {object = object, status = status}
+        Osi.TimerLaunch(wildshapeTimer, 500)
+        --Ext.Utils.Print("Scheduled removal of status: " .. status .. " from object: " .. object)
     end
 end)
 ------------------------------------------------------------------------------------------------
