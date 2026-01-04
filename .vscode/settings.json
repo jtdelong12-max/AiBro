@@ -23,5 +23,7 @@
     },
     "files.associations": {
         "*.txt": "bg3txt"
-    }
+    },
+    "bg3ModHelper.rootModPath": "\\jtdelong12-max\\AiBro",
+    "bg3ModHelper.packingPriority": 0
 }
