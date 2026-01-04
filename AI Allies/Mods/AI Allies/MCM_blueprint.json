@@ -1,0 +1,79 @@
+{
+  "SchemaVersion": 1,
+  "Tabs": [
+    {
+      "TabId": "aiAlliesTab",
+      "TabName": "AI Allies Global Settings",
+      "Sections": [
+        {
+          "SectionId": "generalSettings",
+          "SectionName": "General Settings",
+          "Settings": [
+            {
+              "Id": "enableDebugSpells",
+              "Name": "Enable Debug Spells",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Add debug spells to AI Allies: Extra Spells."
+            },
+            {
+              "Id": "enableCustomArchetypes",
+              "Name": "Enable Custom Archetypes",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Give custom archetype spells."
+            },
+            {
+              "Id": "enableAlliesMind",
+              "Name": "Enable Mindcontrol Art",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Give Mindcontrol spells."
+            },
+            {
+              "Id": "enableAlliesSwarm",
+              "Name": "Give Swarm Spells",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Give the Swarm Group spells. WARNING: Swarm AI is VERY limited."
+            },
+            {
+              "Id": "enableOrdersBonusAction",
+              "Name": "Enable Focus/Ignore Bonus Action Cost",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Makes Focus/Ignore spells cost a bonus action and slightly changes mechanics."
+            }
+          ]
+        },
+        {
+          "SectionId": "combatSettings",
+          "SectionName": "Combat Settings",
+          "Settings": [
+            {
+              "Id": "disableAlliesDashing",
+              "Name": "Disable Allies Dashing",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Disable dashing for all allies."
+            },
+            {
+              "Id": "disableAlliesThrowing",
+              "Name": "Disable Allies Throwing",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Disable throwing for all allies."
+            },
+            {
+              "Id": "enableDynamicSpellblock",
+              "Name": "Enable Dynamic Spellblock",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Block spell usage depending on the character's health percentage."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
