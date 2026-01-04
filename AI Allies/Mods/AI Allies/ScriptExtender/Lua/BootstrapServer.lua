@@ -6,6 +6,54 @@ if Mods.BG3MCM then
     setmetatable(Mods.AIAllies, { __index = Mods.BG3MCM })
 end
 
+----------------------------------------------------------------------------------
+-- Constants
+----------------------------------------------------------------------------------
+local CONSTANTS = {
+    -- Timer delays (milliseconds)
+    COMBAT_RESUME_DELAY = 2000,
+    WILDSHAPE_REMOVAL_DELAY = 500,
+    SPELL_MODIFICATION_DELAY = 250,
+    CHARACTER_ADD_DELAY = 1000,
+    COMBAT_SAFETY_TIMEOUT = 60000,
+    
+    -- Status durations
+    AI_ALLY_DURATION = -1,
+    FOR_AI_SPELLS_DURATION = -1,
+    
+    -- Debug settings
+    DEBUG_MODE = false  -- Set to true to enable debug logging
+}
+
+----------------------------------------------------------------------------------
+-- Debug Logging System
+----------------------------------------------------------------------------------
+Mods.AIAllies.Debug = CONSTANTS.DEBUG_MODE
+
+--- Conditional debug logging function
+--- @param message string The message to log
+--- @param category string Optional category for filtering logs
+local function DebugLog(message, category)
+    if Mods.AIAllies.Debug then
+        local prefix = category and "[" .. category .. "] " or "[DEBUG] "
+        Ext.Utils.Print(prefix .. message)
+    end
+end
+
+--- Safe wrapper for Osiris API calls with error handling
+--- @param func function The Osiris function to call
+--- @param ... any Arguments to pass to the function
+--- @return boolean success Whether the call succeeded
+--- @return any result The result of the function call or error message
+local function SafeOsiCall(func, ...)
+    local success, result = pcall(func, ...)
+    if not success then
+        Ext.Utils.Print("[ERROR] Osiris call failed: " .. tostring(result))
+        return false, result
+    end
+    return true, result
+end
+
 
 Mods.AIAllies.PersistentVars = Mods.AIAllies.PersistentVars or {}
 Mods.AIAllies.PersistentVars.firstTimeRewardGiven = Mods.AIAllies.PersistentVars.firstTimeRewardGiven or false
@@ -46,132 +94,59 @@ end
 -- Subscribe to the SessionLoaded event to initialize CurrentAllies
 Ext.Events.SessionLoaded:Subscribe(InitCurrentAllies)
 -------------------------------------------------------------------------------
--- MCM test
--- Function to check and manage custom archetypes
-local function ManageCustomArchetypes()
-    if Mods.AIAllies.MCMAPI then
-        local enableCustomArchetypes = Mods.AIAllies.MCMAPI:GetSettingValue("enableCustomArchetypes", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if enableCustomArchetypes then
-                if Osi.HasPassive(character, 'UnlockCustomArchetypes') == 0 then
-                    Osi.AddPassive(character, 'UnlockCustomArchetypes')
-                    --Ext.Utils.Print("Given 'UnlockCustomArchetypes' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'UnlockCustomArchetypes') == 1 then
-                    Osi.RemovePassive(character, 'UnlockCustomArchetypes')
-                    --Ext.Utils.Print("Removed 'UnlockCustomArchetypes' from: " .. character)
-                end
-            end
+-- MCM Management System
+-------------------------------------------------------------------------------
+
+--- Generic function to manage MCM-controlled passives
+--- @param settingKey string The MCM setting key to check
+--- @param passiveName string The passive ability to add/remove
+--- @param inverted boolean Optional - if true, passive is added when setting is false
+local function ManageMCMPassive(settingKey, passiveName, inverted)
+    if not Mods.AIAllies.MCMAPI then
+        return
+    end
+    
+    local settingValue = Mods.AIAllies.MCMAPI:GetSettingValue(settingKey, ModuleUUID)
+    local shouldHavePassive = inverted and not settingValue or settingValue
+    local players = Osi.DB_PartOfTheTeam:Get(nil)
+    
+    for _, player in pairs(players) do
+        local character = player[1]
+        local hasPassive = Osi.HasPassive(character, passiveName) == 1
+        
+        if shouldHavePassive and not hasPassive then
+            Osi.AddPassive(character, passiveName)
+            DebugLog("Added '" .. passiveName .. "' to: " .. character, "MCM")
+        elseif not shouldHavePassive and hasPassive then
+            Osi.RemovePassive(character, passiveName)
+            DebugLog("Removed '" .. passiveName .. "' from: " .. character, "MCM")
         end
     end
+end
+
+-- Legacy wrapper functions for backward compatibility
+local function ManageCustomArchetypes()
+    ManageMCMPassive("enableCustomArchetypes", "UnlockCustomArchetypes")
 end
 
 local function ManageAlliesMind()
-    if Mods.AIAllies.MCMAPI then
-        local enableAlliesMind = Mods.AIAllies.MCMAPI:GetSettingValue("enableAlliesMind", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if enableAlliesMind then
-                if Osi.HasPassive(character, 'AlliesMind') == 0 then
-                    Osi.AddPassive(character, 'AlliesMind')
-                    --Ext.Utils.Print("Given 'AlliesMind' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'AlliesMind') == 1 then
-                    Osi.RemovePassive(character, 'AlliesMind')
-                    --Ext.Utils.Print("Removed 'AlliesMind' from: " .. character)
-                end
-            end
-        end
-    end
+    ManageMCMPassive("enableAlliesMind", "AlliesMind")
 end
 
 local function ManageAlliesDashing()
-    if Mods.AIAllies.MCMAPI then
-        local disableAlliesDashing = Mods.AIAllies.MCMAPI:GetSettingValue("disableAlliesDashing", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if disableAlliesDashing then
-                if Osi.HasPassive(character, 'AlliesDashingDisabled') == 0 then
-                    Osi.AddPassive(character, 'AlliesDashingDisabled')
-                    --Ext.Utils.Print("Added 'AlliesDashingDisabled' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'AlliesDashingDisabled') == 1 then
-                    Osi.RemovePassive(character, 'AlliesDashingDisabled')
-                    --Ext.Utils.Print("Removed 'AlliesDashingDisabled' from: " .. character)
-                end
-            end
-        end
-    end
+    ManageMCMPassive("disableAlliesDashing", "AlliesDashingDisabled")
 end
 
 local function ManageAlliesThrowing()
-    if Mods.AIAllies.MCMAPI then
-        local disableAlliesThrowing = Mods.AIAllies.MCMAPI:GetSettingValue("disableAlliesThrowing", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if disableAlliesThrowing then
-                if Osi.HasPassive(character, 'AlliesThrowingDisabled') == 0 then
-                    Osi.AddPassive(character, 'AlliesThrowingDisabled')
-                    --Ext.Utils.Print("Added 'AlliesThrowingDisabled' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'AlliesThrowingDisabled') == 1 then
-                    Osi.RemovePassive(character, 'AlliesThrowingDisabled')
-                    --Ext.Utils.Print("Removed 'AlliesThrowingDisabled' from: " .. character)
-                end
-            end
-        end
-    end
+    ManageMCMPassive("disableAlliesThrowing", "AlliesThrowingDisabled")
 end
 
 local function ManageDynamicSpellblock()
-    if Mods.AIAllies.MCMAPI then
-        local enableDynamicSpellblock = Mods.AIAllies.MCMAPI:GetSettingValue("enableDynamicSpellblock", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if enableDynamicSpellblock then
-                if Osi.HasPassive(character, 'AlliesDynamicSpellblock') == 0 then
-                    Osi.AddPassive(character, 'AlliesDynamicSpellblock')
-                    --Ext.Utils.Print("Given 'AlliesDynamicSpellblock' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'AlliesDynamicSpellblock') == 1 then
-                    Osi.RemovePassive(character, 'AlliesDynamicSpellblock')
-                    --Ext.Utils.Print("Removed 'AlliesDynamicSpellblock' from: " .. character)
-                end
-            end
-        end
-    end
+    ManageMCMPassive("enableDynamicSpellblock", "AlliesDynamicSpellblock")
 end
 
 local function ManageAlliesSwarm()
-    if Mods.AIAllies.MCMAPI then
-        local enableAlliesSwarm = Mods.AIAllies.MCMAPI:GetSettingValue("enableAlliesSwarm", ModuleUUID)
-        local players = Osi.DB_PartOfTheTeam:Get(nil)
-        for _, player in pairs(players) do
-            local character = player[1]
-            if enableAlliesSwarm then
-                if Osi.HasPassive(character, 'AlliesSwarm') == 0 then
-                    Osi.AddPassive(character, 'AlliesSwarm')
-                    --Ext.Utils.Print("Given 'AlliesSwarm' to: " .. character)
-                end
-            else
-                if Osi.HasPassive(character, 'AlliesSwarm') == 1 then
-                    Osi.RemovePassive(character, 'AlliesSwarm')
-                    --Ext.Utils.Print("Removed 'AlliesSwarm' from: " .. character)
-                end
-            end
-        end
-    end
+    ManageMCMPassive("enableAlliesSwarm", "AlliesSwarm")
 end
 
 local function ManageOrderSpellsPassive()
@@ -490,13 +465,14 @@ Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status
     elseif isControllerStatus(status) and Osi.IsPartyFollower(object) == 0 then
         local uuid = Osi.GetUUID(object)
         local PFtimer = "AddToAlliesTimer_" .. uuid
-        Osi.TimerLaunch(PFtimer, 1000)
+        Osi.TimerLaunch(PFtimer, CONSTANTS.CHARACTER_ADD_DELAY)
         Mods.AIAllies.characterTimers[PFtimer] = uuid
-        Ext.Utils.Print("Started timer for " .. uuid)
+        DebugLog("Started timer for " .. uuid, "TIMER")
     end
 end)
 
--- Remove a specific character's UUID from CurrentAllies
+--- Remove a specific character from CurrentAllies tracking
+--- @param uuid string The UUID of the character to remove
 local function RemoveFromCurrentAllies(uuid)
     CurrentAllies[uuid] = nil
     Mods.AIAllies.PersistentVars.CurrentAllies = CurrentAllies
@@ -601,6 +577,9 @@ local function CanFollow()
     return Osi.HasActiveStatus(playerCharacter, 'ALLIES_ORDER_FOLLOW') == 1
 end
 
+--- Teleport a character to the host player's location
+--- @param character string The character UUID to teleport
+--- @param alwaysTeleport boolean If true, always teleport; if false, only teleport if follow order is active
 local function TeleportCharacterToPlayer(character, alwaysTeleport)
     local playerCharacter = Osi.GetHostCharacter()
     -- Add entity existence validation
@@ -721,7 +700,11 @@ local controllerToStatusTranslator = {
     AI_ALLIES_TRICKSTER_Controller = 'AI_ALLIES_TRICKSTER'
 }
 
--- Function to apply status based on controller buff
+--- Apply combat AI status based on the character's controller buff
+--- Translates Controller statuses (e.g., AI_ALLIES_MELEE_Controller) to combat statuses (e.g., AI_ALLIES_MELEE)
+--- Automatically appends _NPC suffix if character has ToggleIsNPC status
+--- @param character string The character UUID
+--- @return boolean success True if a status was applied, false otherwise
 local function ApplyStatusFromControllerBuff(character)
     for controllerBuff, status in pairs(controllerToStatusTranslator) do
         if Osi.HasActiveStatus(character, controllerBuff) == 1 then
@@ -752,9 +735,9 @@ Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function(object, combat
         ApplyStatusFromControllerBuff(object)
     end
     if hasControllerStatus(object) then
-        -- Note: AlliesBannedActions removed - it was blocking too many utility spells
-        -- Only apply if specific problematic behaviors are observed
-        Osi.ApplyStatus(object, "AI_ALLY", -1)
+        -- Note: AlliesBannedActions is applied to specific utility spells in Block_AI.txt
+        -- to prevent AI from wasting actions on non-combat spells during fights
+        Osi.ApplyStatus(object, "AI_ALLY", CONSTANTS.AI_ALLY_DURATION)
         Osi.ApplyStatus(object, "FOR_AI_SPELLS", -1)
         --Ext.Utils.Print("(Entered Combat) Applied AI statuses to " .. object)
     end
@@ -921,7 +904,10 @@ local spellMappings = {
     ['Shout_Rage_WildMagic'] = 'Shout_Rage_WildMagic_AI'
 }
 
--- Function to add or remove AI spells based on the original spell
+--- Add or remove AI-specific spell variants for a character
+--- Maps base spells (e.g., Shout_Dash) to AI versions (e.g., Shout_Dash_AI)
+--- @param character string The character UUID
+--- @param addSpell boolean True to add AI spells, false to remove them
 local function ModifyAISpells(character, addSpell)
     -- Validate entity exists before modifying spells
     if not character or Osi.Exists(character) ~= 1 then
@@ -953,7 +939,7 @@ local function ProcessQueue()
     ModifyAISpells(character, true)
 
     local nextProcessTimer = "NextProcessTimer_" .. character
-    Osi.TimerLaunch(nextProcessTimer, 250)
+    Osi.TimerLaunch(nextProcessTimer, CONSTANTS.SPELL_MODIFICATION_DELAY)
     Mods.AIAllies.spellModificationTimers[nextProcessTimer] = function() ProcessQueue() end
 end
 
@@ -1172,11 +1158,11 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", OnUsingSpellOnTarg
 
 Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     Osi.PauseCombat(combatGuid)
-    Ext.Utils.Print("Pausing combat to allow AI to initialize")
+    DebugLog("Pausing combat to allow AI to initialize", "COMBAT")
     local InitializeTimerAI = "ResumeCombatTimer_" .. tostring(combatGuid)
     Mods.AIAllies.combatTimers[InitializeTimerAI] = combatGuid
     Mods.AIAllies.combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
-    Osi.TimerLaunch(InitializeTimerAI, 2000)
+    Osi.TimerLaunch(InitializeTimerAI, CONSTANTS.COMBAT_RESUME_DELAY)
 end)
 
 -- Fallback: Force resume combat if it's been paused too long (safety mechanism)
@@ -1184,7 +1170,7 @@ Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(entityGuid)
     local combatGuid = Osi.CombatGetGuidFor(entityGuid)
     if combatGuid and Mods.AIAllies.combatStartTimes[combatGuid] then
         local elapsed = Ext.Utils.MonotonicTime() - Mods.AIAllies.combatStartTimes[combatGuid]
-        if elapsed > 60000 then -- 60 second safety timeout
+        if elapsed > CONSTANTS.COMBAT_SAFETY_TIMEOUT then
             Osi.ResumeCombat(combatGuid)
             Ext.Utils.Print("[SAFETY] Force resuming combat after timeout: " .. combatGuid)
             Mods.AIAllies.combatStartTimes[combatGuid] = nil
@@ -1268,10 +1254,10 @@ end)
 -- For wildshape - delay removal to give AI time to process
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
     if status == 'FORCE_USE_MOST' or status == 'FORCE_USE_MORE' then
-        -- Delay removal by 500ms to allow AI to process the status
+        -- Delay removal to allow AI to process the status
         local wildshapeTimer = "WildshapeForceRemove_" .. object .. "_" .. status
         Mods.AIAllies.characterTimers[wildshapeTimer] = {object = object, status = status}
-        Osi.TimerLaunch(wildshapeTimer, 500)
+        Osi.TimerLaunch(wildshapeTimer, CONSTANTS.WILDSHAPE_REMOVAL_DELAY)
         --Ext.Utils.Print("Scheduled removal of status: " .. status .. " from object: " .. object)
     end
 end)
