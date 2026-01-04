@@ -507,10 +507,20 @@ end
 Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function (timer)
     -- Handle character addition timers
     local uuid = Mods.AIAllies.characterTimers[timer]
-    if uuid then
+    if uuid and type(uuid) == "string" then
         CurrentAllies[uuid] = true
         Mods.AIAllies.PersistentVars.CurrentAllies = CurrentAllies
         Ext.Utils.Print("Added to CurrentAllies after delay: " .. uuid)
+        Mods.AIAllies.characterTimers[timer] = nil
+        return
+    end
+    
+    -- Handle wildshape FORCE_USE status removal (table with object and status)
+    if uuid and type(uuid) == "table" and uuid.object and uuid.status then
+        if Osi.Exists(uuid.object) == 1 then
+            Osi.RemoveStatus(uuid.object, uuid.status)
+            --Ext.Utils.Print("Removed wildshape status: " .. uuid.status .. " from " .. uuid.object)
+        end
         Mods.AIAllies.characterTimers[timer] = nil
         return
     end
@@ -551,9 +561,13 @@ end)
 ---------------------------------------------------------------------------------------------
 Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     for uuid, _ in pairs(CurrentAllies) do
-        if CurrentAllies[uuid] then
+        if CurrentAllies[uuid] and Osi.Exists(uuid) == 1 then
             Osi.ApplyStatus(uuid, 'AI_ALLY', -1)
             --Ext.Utils.Print("Combat started, marking character as ally: " .. uuid)
+        elseif CurrentAllies[uuid] and Osi.Exists(uuid) ~= 1 then
+            -- Cleanup dead entities
+            CurrentAllies[uuid] = nil
+            Ext.Utils.Print("[CLEANUP] Removed dead entity from CurrentAllies: " .. uuid)
         end
     end
 end)
@@ -593,7 +607,7 @@ local function TeleportCharacterToPlayer(character, alwaysTeleport)
     if not playerCharacter or not character then
         return
     end
-    if not Osi.Exists(character) == 1 or not Osi.Exists(playerCharacter) == 1 then
+    if Osi.Exists(character) ~= 1 or Osi.Exists(playerCharacter) ~= 1 then
         Ext.Utils.Print("[WARNING] Cannot teleport - entity does not exist")
         return
     end
@@ -680,7 +694,7 @@ end)
 -- Don't betray the player, ignore their crimes
 Ext.Osiris.RegisterListener("CrimeIsRegistered", 8, "after", function(victim, crimeType, crimeID, evidence, criminal1, criminal2, criminal3, criminal4)
     for uuid, _ in pairs(CurrentAllies) do
-        if CurrentAllies[uuid] then
+        if CurrentAllies[uuid] and Osi.Exists(uuid) == 1 then
             Osi.CrimeIgnoreCrime(crimeID, uuid)
             Osi.CharacterIgnoreActiveCrimes(uuid)
             Osi.BlockNewCrimeReactions(uuid, 1)
@@ -879,7 +893,7 @@ Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(character)
     if not hasAnyNPCStatus(character) then
         local status = ApplyStatusBasedOnBuff(character)
         if status then
-            _G.appliedStatuses[character] = status
+            Mods.AIAllies.appliedStatuses[character] = status
         end
     end
 end)
@@ -887,11 +901,11 @@ end)
 -- Listener for TurnEnded event
 Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
     if not hasAnyNPCStatus(character) then
-        local status = _G.appliedStatuses[character]
+        local status = Mods.AIAllies.appliedStatuses[character]
         if status then
             Osi.RemoveStatus(character, status, character)
             Ext.Utils.Print("Removed " .. status .. " from " .. character)
-            _G.appliedStatuses[character] = nil
+            Mods.AIAllies.appliedStatuses[character] = nil
         end
     end
 end)
@@ -1012,8 +1026,14 @@ local function HandleDialogActorJoined(instanceID, actor)
     end
     
     if instanceID == relevantDialogInstance and IsCurrentAlly(actorUuid) and HasRelevantStatus(actor) then
+        -- Preserve faction before making player
+        local originalFaction = Osi.GetFaction(actor)
+        transformedCompanions[actorUuid] = {
+            wasNPC = true,
+            faction = originalFaction
+        }
+        
         Osi.MakePlayer(actor)
-        transformedCompanions[actorUuid] = true
         Ext.Utils.Print("Temporarily turned " .. actor .. " into a player for dialog instance " .. tostring(instanceID))
     end
 end
@@ -1024,7 +1044,7 @@ end)
 
 local function HandleDialogEnded(dialog, instanceID)
     if instanceID == relevantDialogInstance then
-        for actorUuid, _ in pairs(transformedCompanions) do
+        for actorUuid, data in pairs(transformedCompanions) do
             -- Validate entity still exists
             if Osi.Exists(actorUuid) ~= 1 then
                 Ext.Utils.Print("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion")
@@ -1032,6 +1052,11 @@ local function HandleDialogEnded(dialog, instanceID)
                 Ext.Utils.Print("Character " .. actorUuid .. " is not in combat, remaining as player character after dialog end.")
             else
                 Osi.MakeNPC(actorUuid)
+                -- Restore original faction
+                if type(data) == "table" and data.faction then
+                    Osi.SetFaction(actorUuid, data.faction)
+                    Ext.Utils.Print("[FACTION] Restored faction for " .. actorUuid .. " to " .. data.faction)
+                end
                 Ext.Utils.Print("Reverted " .. actorUuid .. " back to NPC after dialog end in instance " .. tostring(instanceID))
             end
         end
