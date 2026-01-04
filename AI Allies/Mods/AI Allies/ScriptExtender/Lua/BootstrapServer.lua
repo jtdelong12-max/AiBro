@@ -1170,16 +1170,6 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", OnUsingSpellOnTarg
 ------------------------------------------------------------------------------------------------
 -- Testing - Pause combat when it starts to give AI time to initialize 
 
-local function OnCombatResumeTimerFinished(InitializeTimerAI)
-    local combatGuid = Mods.AIAllies.combatTimers[InitializeTimerAI]
-    if combatGuid then
-        Osi.ResumeCombat(combatGuid)
-        Ext.Utils.Print("Resuming combat")
-        Mods.AIAllies.combatTimers[InitializeTimerAI] = nil
-        Mods.AIAllies.combatStartTimes[combatGuid] = nil
-    end
-end
-
 Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
     Osi.PauseCombat(combatGuid)
     Ext.Utils.Print("Pausing combat to allow AI to initialize")
