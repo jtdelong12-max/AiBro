@@ -24,6 +24,15 @@ Shared.CONSTANTS = {
     ENTITY_CACHE_REFRESH = 1000,  -- How often to refresh entity existence cache (ms)
     EVENT_THROTTLE_DELAY = 100,    -- Minimum delay between identical event processing (ms)
     
+    -- Formation positioning
+    FORMATION_DISTANCE = 3.0,      -- Distance between formation positions
+    FORMATION_UPDATE_INTERVAL = 2000,  -- How often to update formation positions (ms)
+    
+    -- Advanced features
+    AUTO_HEAL_THRESHOLD = 0.5,     -- Health percentage to trigger auto-heal (50%)
+    AGGRESSION_LEVEL_DEFAULT = 1.0, -- Default aggression multiplier
+    SPELL_PRIORITY_ENABLED = false, -- Enable spell priority system
+    
     -- Debug settings
     DEBUG_MODE = false  -- Set to true to enable debug logging
 }
@@ -104,6 +113,97 @@ function Shared.SafeOsiCall(func, ...)
 end
 
 ----------------------------------------------------------------------------------
+-- Multiplayer Support Functions
+----------------------------------------------------------------------------------
+--- Get all player characters in the party
+--- @return table Array of player character UUIDs
+function Shared.GetAllPlayers()
+    local players = {}
+    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
+    for _, member in pairs(partyMembers) do
+        local character = member[1]
+        if Osi.IsPlayer(character) == 1 then
+            table.insert(players, character)
+        end
+    end
+    return players
+end
+
+--- Get the player character who owns/summoned an entity
+--- Falls back to host character if owner cannot be determined
+--- @param entity string The entity UUID to find the owner for
+--- @return string|nil The owning player UUID or nil
+function Shared.GetPlayerForEntity(entity)
+    if not entity then
+        return Osi.GetHostCharacter()
+    end
+    
+    -- If the entity itself is a player, return it
+    if Osi.IsPlayer(entity) == 1 then
+        return entity
+    end
+    
+    -- Check if entity is a party follower (summoned/controlled by a player)
+    local players = Shared.GetAllPlayers()
+    for _, player in ipairs(players) do
+        -- Check if this player is the summoner
+        local summoner = Osi.GetSummoner(entity)
+        if summoner == player then
+            return player
+        end
+        
+        -- Check if entity is following this player
+        if Osi.IsPartyFollower(entity, player) == 1 then
+            return player
+        end
+    end
+    
+    -- Fallback: return host character
+    return Osi.GetHostCharacter()
+end
+
+--- Execute a function for each player in the party
+--- @param callback function Function to call with each player UUID
+function Shared.ForEachPlayer(callback)
+    local players = Shared.GetAllPlayers()
+    for _, player in ipairs(players) do
+        callback(player)
+    end
+end
+
+--- Get the closest player to an entity
+--- @param entity string The entity UUID
+--- @return string|nil The closest player UUID or nil
+function Shared.GetClosestPlayer(entity)
+    if not entity or Shared.CachedExists(entity) ~= 1 then
+        return Osi.GetHostCharacter()
+    end
+    
+    local players = Shared.GetAllPlayers()
+    if #players == 0 then
+        return Osi.GetHostCharacter()
+    end
+    
+    if #players == 1 then
+        return players[1]
+    end
+    
+    -- Find closest player by distance
+    local closestPlayer = players[1]
+    local closestDistance = Osi.GetDistanceTo(entity, closestPlayer)
+    
+    for i = 2, #players do
+        local distance = Osi.GetDistanceTo(entity, players[i])
+        if distance < closestDistance then
+            closestDistance = distance
+            closestPlayer = players[i]
+        end
+    end
+    
+    return closestPlayer
+end
+
+----------------------------------------------------------------------------------
 -- String Constants
 ----------------------------------------------------------------------------------
 Shared.STATUS = {
@@ -123,6 +223,11 @@ Shared.STATUS = {
     THROWER_CONTROLLER = "AI_ALLIES_THROWER_CONTROLLER",
     DEFAULT_CONTROLLER = "AI_ALLIES_DEFAULT_Controller",
     AI_CONTROLLED = "AI_CONTROLLED",
+    -- New archetype controllers
+    SUPPORT_CONTROLLER = "AI_ALLIES_SUPPORT_Controller",
+    SCOUT_CONTROLLER = "AI_ALLIES_SCOUT_Controller",
+    TANK_CONTROLLER = "AI_ALLIES_TANK_Controller",
+    CONTROLLER_CONTROLLER = "AI_ALLIES_CONTROLLER_Controller",
     
     -- Combat Statuses (Player)
     MELEE = "AI_ALLIES_MELEE",
@@ -138,6 +243,11 @@ Shared.STATUS = {
     CUSTOM_3 = "AI_ALLIES_CUSTOM_3",
     CUSTOM_4 = "AI_ALLIES_CUSTOM_4",
     THROWER = "AI_ALLIES_THROWER",
+    -- New archetype combat statuses
+    SUPPORT = "AI_ALLIES_SUPPORT",
+    SCOUT = "AI_ALLIES_SCOUT",
+    TANK = "AI_ALLIES_TANK",
+    CONTROLLER = "AI_ALLIES_CONTROLLER",
     DEFAULT = "AI_ALLIES_DEFAULT",
     
     -- Combat Statuses (NPC)
@@ -155,6 +265,11 @@ Shared.STATUS = {
     CUSTOM_4_NPC = "AI_ALLIES_CUSTOM_4_NPC",
     THROWER_NPC = "AI_ALLIES_THROWER_NPC",
     DEFAULT_NPC = "AI_ALLIES_DEFAULT_NPC",
+    -- New archetype NPC combat statuses
+    SUPPORT_NPC = "AI_ALLIES_SUPPORT_NPC",
+    SCOUT_NPC = "AI_ALLIES_SCOUT_NPC",
+    TANK_NPC = "AI_ALLIES_TANK_NPC",
+    CONTROLLER_NPC = "AI_ALLIES_CONTROLLER_NPC",
     
     -- Special Statuses
     AI_ALLY = "AI_ALLY",
@@ -169,7 +284,19 @@ Shared.STATUS = {
     MARK_PLAYER = "MARK_PLAYER",
     FORCE_USE = "FORCE_USE",
     FORCE_USE_MORE = "FORCE_USE_MORE",
-    FORCE_USE_MOST = "FORCE_USE_MOST"
+    FORCE_USE_MOST = "FORCE_USE_MOST",
+    
+    -- Formation statuses
+    FORMATION_FRONTLINE = "ALLIES_FORMATION_FRONTLINE",
+    FORMATION_MIDLINE = "ALLIES_FORMATION_MIDLINE",
+    FORMATION_BACKLINE = "ALLIES_FORMATION_BACKLINE",
+    FORMATION_SCATTERED = "ALLIES_FORMATION_SCATTERED",
+    
+    -- Advanced feature statuses
+    AUTO_HEAL_ENABLED = "ALLIES_AUTO_HEAL",
+    AGGRESSIVE_MODE = "ALLIES_AGGRESSIVE",
+    DEFENSIVE_MODE = "ALLIES_DEFENSIVE",
+    SUPPORT_MODE = "ALLIES_SUPPORT"
 }
 
 Shared.SPELL = {
@@ -194,7 +321,19 @@ Shared.SPELL = {
     ALLIES_TELEPORT = "C_Shout_Allies_Teleport",
     FACTION_JOIN = "G_Target_Allies_Faction",
     FACTION_LEAVE = "H_Target_Allies_Faction_Leave",
-    CHECK_ARCHETYPE = "I_Target_Allies_Check_Archetype"
+    CHECK_ARCHETYPE = "I_Target_Allies_Check_Archetype",
+    
+    -- Formation spells
+    SET_FORMATION_FRONTLINE = "Target_Allies_Formation_Frontline",
+    SET_FORMATION_MIDLINE = "Target_Allies_Formation_Midline",
+    SET_FORMATION_BACKLINE = "Target_Allies_Formation_Backline",
+    SET_FORMATION_SCATTERED = "Target_Allies_Formation_Scattered",
+    
+    -- Advanced feature spells
+    TOGGLE_AUTO_HEAL = "Target_Allies_Toggle_AutoHeal",
+    SET_AGGRESSIVE = "Target_Allies_Mode_Aggressive",
+    SET_DEFENSIVE = "Target_Allies_Mode_Defensive",
+    SET_SUPPORT = "Target_Allies_Mode_Support"
 }
 
 Shared.PASSIVE = {
@@ -209,7 +348,15 @@ Shared.PASSIVE = {
     UNLOCK_ALLIES_EXTRA_SPELLS = "UnlockAlliesExtraSpells",
     UNLOCK_ALLIES_EXTRA_SPELLS_ALT = "UnlockAlliesExtraSpellsAlt",
     GIVE_ALLIES_SPELL = "GiveAlliesSpell",
-    ALLIES_TOGGLE_NPC = "AlliesToggleNPC"
+    ALLIES_TOGGLE_NPC = "AlliesToggleNPC",
+    
+    -- Formation passives
+    UNLOCK_FORMATIONS = "UnlockAlliesFormations",
+    
+    -- Advanced feature passives
+    UNLOCK_ADVANCED_AI = "UnlockAdvancedAI",
+    UNLOCK_AUTO_HEAL = "UnlockAutoHeal",
+    UNLOCK_AGGRESSION_MODES = "UnlockAggressionModes"
 }
 
 return Shared

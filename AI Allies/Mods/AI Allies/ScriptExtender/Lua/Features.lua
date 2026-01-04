@@ -32,17 +32,18 @@ local currentWarningIndex = 1
 ----------------------------------------------------------------------------------
 -- Warning System (ToggleIsNPC Easter Egg)
 ----------------------------------------------------------------------------------
-local function GetNextWarningMessage()
+--- Get warning message and bribe player (supports multiplayer)
+local function GetNextWarningMessage(targetPlayer)
     local message = warningMessages[currentWarningIndex]
     if currentWarningIndex == #warningMessages then
-        local hostCharacter = Osi.GetHostCharacter()
+        local player = targetPlayer or Osi.GetHostCharacter()
         if not Mods.AIAllies.PersistentVars.firstTimeRewardGiven then
-            Osi.UserAddGold(hostCharacter, 200)
+            Osi.UserAddGold(player, 200)
             Mods.AIAllies.PersistentVars.firstTimeRewardGiven = true
-            Ext.Utils.Print("Attempting to bribe player: " .. hostCharacter)
+            Ext.Utils.Print("Attempting to bribe player: " .. player)
         else
-            Osi.UserAddGold(hostCharacter, 2)
-            Ext.Utils.Print("Attempting to bribe a greedy player: " .. hostCharacter)
+            Osi.UserAddGold(player, 2)
+            Ext.Utils.Print("Attempting to bribe a greedy player: " .. player)
         end
     end
     currentWarningIndex = currentWarningIndex % #warningMessages + 1
@@ -57,56 +58,70 @@ local function UpdateMindControlStatus(character, status)
     Mods.AIAllies.PersistentVars.charactersUnderMindControl = charactersUnderMindControl
 end
 
+--- Check if any player has the follow order active
 local function CanFollow()
-    local playerCharacter = Osi.GetHostCharacter()
-    return Osi.HasActiveStatus(playerCharacter, STATUS.ALLIES_ORDER_FOLLOW) == 1
+    local players = Shared.GetAllPlayers()
+    for _, player in ipairs(players) do
+        if Osi.HasActiveStatus(player, STATUS.ALLIES_ORDER_FOLLOW) == 1 then
+            return true, player
+        end
+    end
+    return false, nil
 end
 
+--- Update following behavior for a character (multiplayer-aware)
 local function UpdateFollowingBehavior(character)
-    local playerCharacter = Osi.GetHostCharacter()
-    if CanFollow() then
+    local canFollow, playerCharacter = CanFollow()
+    if canFollow and playerCharacter then
         Osi.PROC_Follow(character, playerCharacter)
     end
 end
 
+--- Update follow for all characters under mind control
 local function UpdateFollowForAll()
-    local playerCharacter = Osi.GetHostCharacter()
-    if CanFollow() then
+    local canFollow, playerCharacter = CanFollow()
+    if canFollow and playerCharacter then
         for character, _ in pairs(charactersUnderMindControl) do
             Osi.PROC_Follow(character, playerCharacter)
         end
     end
 end
 
---- Teleport a character to the host player's location
+--- Teleport a character to their owner player (multiplayer-aware)
+--- @param character string The character to teleport
+--- @param alwaysTeleport boolean If true, always teleport; if false, only if follow order active
 function Features.TeleportCharacterToPlayer(character, alwaysTeleport)
-    local playerCharacter = Osi.GetHostCharacter()
-    if not playerCharacter or not character then
-        return
-    end
-    if CachedExists(character) ~= 1 or CachedExists(playerCharacter) ~= 1 then
-        Ext.Utils.Print("[WARNING] Cannot teleport - entity does not exist")
+    if not character or CachedExists(character) ~= 1 then
         return
     end
     
-    if alwaysTeleport or CanFollow() then
+    -- Determine which player to teleport to
+    local playerCharacter = Shared.GetPlayerForEntity(character)
+    if not playerCharacter or CachedExists(playerCharacter) ~= 1 then
+        Ext.Utils.Print("[WARNING] Cannot teleport - no valid player found")
+        return
+    end
+    
+    local canFollow, _ = CanFollow()
+    if alwaysTeleport or canFollow then
         local success = SafeOsiCall(Osi.TeleportTo, character, playerCharacter)
         if success then
             DebugLog("Teleported " .. character .. " to player: " .. playerCharacter, "TELEPORT")
-            if CanFollow() then
+            if canFollow then
                 SafeOsiCall(Osi.PROC_Follow, character, playerCharacter)
             end
         end
     end
 end
 
+--- Teleport all allies to the caster (multiplayer-aware)
 function Features.TeleportAlliesToCaster(caster, CurrentAllies)
-    local target = Osi.GetHostCharacter()
+    -- Teleport to the caster's location
     for uuid, _ in pairs(CurrentAllies) do
         if CurrentAllies[uuid] then
-            local success = SafeOsiCall(Osi.TeleportTo, uuid, target, "", 1, 1, 1, 0, 1)
+            local success = SafeOsiCall(Osi.TeleportTo, uuid, caster, "", 1, 1, 1, 0, 1)
             if success then
-                DebugLog("Teleporting ally: " .. uuid, "TELEPORT")
+                DebugLog("Teleporting ally: " .. uuid .. " to caster: " .. caster, "TELEPORT")
             end
         end
     end
@@ -147,10 +162,11 @@ function Features.RegisterListeners(CurrentAllies)
     -- ToggleIsNPC warning system
     Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
         if status == STATUS.TOGGLE_IS_NPC and Osi.IsPartyFollower(object) == 1 then
-            local hostCharacter = Osi.GetHostCharacter()
-            Osi.ApplyStatus(object, STATUS.ALLIES_WARNING, 0, 0, hostCharacter)
+            -- Find which player owns this follower
+            local ownerPlayer = Shared.GetPlayerForEntity(object)
+            Osi.ApplyStatus(object, STATUS.ALLIES_WARNING, 0, 0, ownerPlayer)
             Osi.TogglePassive(object, PASSIVE.ALLIES_TOGGLE_NPC)
-            Osi.ShowNotification(hostCharacter, GetNextWarningMessage())
+            Osi.ShowNotification(ownerPlayer, GetNextWarningMessage(ownerPlayer))
             Ext.Utils.Print("Not enabling NPC toggle, character is a party follower: " .. object)
         end
     end)
@@ -208,21 +224,21 @@ function Features.RegisterListeners(CurrentAllies)
         end
     end)
     
-    -- Possession system
+    -- Possession system (multiplayer-aware)
     Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
         if status == STATUS.AI_ALLIES_POSSESSED then
-            local hostCharacter = Osi.GetHostCharacter()
-            local success = SafeOsiCall(Osi.AddPartyFollower, object, hostCharacter)
+            local ownerPlayer = Shared.GetPlayerForEntity(object)
+            local success = SafeOsiCall(Osi.AddPartyFollower, object, ownerPlayer)
             if success then
-                DebugLog("Possessed: " .. object, "POSSESSION")
+                DebugLog("Possessed: " .. object .. " by player: " .. ownerPlayer, "POSSESSION")
             end
         end
     end)
     
     Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function(object, status, causee, storyActionID)
         if status == STATUS.AI_ALLIES_POSSESSED then
-            local hostCharacter = Osi.GetHostCharacter()
-            SafeOsiCall(Osi.RemovePartyFollower, object, hostCharacter)
+            local ownerPlayer = Shared.GetPlayerForEntity(object)
+            SafeOsiCall(Osi.RemovePartyFollower, object, ownerPlayer)
             DebugLog("Stopped Possessing: " .. object, "POSSESSION")
             SafeOsiCall(Osi.ApplyStatus, object, STATUS.AI_CANCEL, 0)
         end
@@ -239,25 +255,24 @@ function Features.RegisterListeners(CurrentAllies)
         end
     end)
     
-    -- Faction debug spells
+    -- Faction debug spells (multiplayer-aware)
     Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function(caster, target, spell, spellType, spellElement, storyActionID)
         if spell == SPELL.FACTION_JOIN then
             local success1, casterFaction = SafeOsiCall(Osi.GetFaction, caster)
             local success2, targetFaction = SafeOsiCall(Osi.GetFaction, target)
-            local hostCharacter = Osi.GetHostCharacter()
 
-            if success1 and success2 and hostCharacter then
-                local success3, hostFaction = SafeOsiCall(Osi.GetFaction, hostCharacter)
+            if success1 and success2 then
+                local success3, casterOriginalFaction = SafeOsiCall(Osi.GetFaction, caster)
                 if success3 then
-                    SafelyUpdateFactionStore(hostCharacter, getCleanFactionID(hostFaction))
+                    SafelyUpdateFactionStore(caster, getCleanFactionID(casterOriginalFaction))
                 end
 
                 DebugLog("Caster's current faction: " .. casterFaction, "FACTION")
                 DebugLog("Target's faction: " .. targetFaction, "FACTION")
 
-                local setSuccess = SafeOsiCall(Osi.SetFaction, hostCharacter, getCleanFactionID(targetFaction))
+                local setSuccess = SafeOsiCall(Osi.SetFaction, caster, getCleanFactionID(targetFaction))
                 if setSuccess then
-                    DebugLog("Changed faction of " .. hostCharacter .. " to " .. getCleanFactionID(targetFaction), "FACTION")
+                    DebugLog("Changed faction of " .. caster .. " to " .. getCleanFactionID(targetFaction), "FACTION")
                 end
             end
         end
@@ -265,12 +280,11 @@ function Features.RegisterListeners(CurrentAllies)
     
     Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function(caster, target, spell, _, _, _, _)
         if spell == SPELL.FACTION_LEAVE then
-            local hostCharacter = Osi.GetHostCharacter()
-            local originalFaction = originalFactions[hostCharacter] or "6545a015-1b3d-66a4-6a0e-6ec62065cdb7"
+            local originalFaction = originalFactions[caster] or "6545a015-1b3d-66a4-6a0e-6ec62065cdb7"
 
-            local success = SafeOsiCall(Osi.SetFaction, hostCharacter, getCleanFactionID(originalFaction))
+            local success = SafeOsiCall(Osi.SetFaction, caster, getCleanFactionID(originalFaction))
             if success then
-                DebugLog("Reverted faction of " .. hostCharacter .. " to " .. getCleanFactionID(originalFaction), "FACTION")
+                DebugLog("Reverted faction of " .. caster .. " to " .. getCleanFactionID(originalFaction), "FACTION")
             end
         end
     end)

@@ -23,6 +23,8 @@ local Combat = Ext.Require("Combat.lua")
 local Timer = Ext.Require("Timer.lua")
 local Dialog = Ext.Require("Dialog.lua")
 local Features = Ext.Require("Features.lua")
+local Formations = Ext.Require("Formations.lua")
+local AdvancedFeatures = Ext.Require("AdvancedFeatures.lua")
 
 -- Export shared utilities for global access
 local STATUS = Shared.STATUS
@@ -32,6 +34,12 @@ local CONSTANTS = Shared.CONSTANTS
 local DebugLog = Shared.DebugLog
 local SafeOsiCall = Shared.SafeOsiCall
 local CachedExists = Shared.CachedExists
+
+-- Export multiplayer functions for global access
+local GetAllPlayers = Shared.GetAllPlayers
+local GetPlayerForEntity = Shared.GetPlayerForEntity
+local GetClosestPlayer = Shared.GetClosestPlayer
+local ForEachPlayer = Shared.ForEachPlayer
 
 -- Initialize debug mode
 Mods.AIAllies.Debug = CONSTANTS.DEBUG_MODE
@@ -128,12 +136,19 @@ Combat.RegisterSwarmListeners()
 Timer.RegisterListeners(CurrentAllies)
 Dialog.RegisterListeners(CurrentAllies)
 Features.RegisterListeners(CurrentAllies)
+Formations.RegisterListeners()
+AdvancedFeatures.RegisterListeners()
+
+-- Initialize new modules
+Formations.Initialize()
+AdvancedFeatures.Initialize()
 
 ----------------------------------------------------------------------------------
 -- Module Initialization Complete
 ----------------------------------------------------------------------------------
 Ext.Utils.Print("========================================")
 Ext.Utils.Print("AI Allies Mod - Modular Edition Loaded")
-Ext.Utils.Print("Modules: Shared, AI, MCM, Combat, Timer, Dialog, Features")
+Ext.Utils.Print("Modules: Shared, AI, MCM, Combat, Timer, Dialog, Features, Formations, AdvancedFeatures")
+Ext.Utils.Print("Multiplayer Support: ENABLED")
 Ext.Utils.Print("Debug Mode: " .. tostring(CONSTANTS.DEBUG_MODE))
 Ext.Utils.Print("========================================")
