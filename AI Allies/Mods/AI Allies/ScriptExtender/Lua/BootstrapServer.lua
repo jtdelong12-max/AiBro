@@ -592,10 +592,12 @@ local function TeleportCharacterToPlayer(character, alwaysTeleport)
     end
     
     if alwaysTeleport or CanFollow() then
-        Osi.TeleportTo(character, playerCharacter)
-        Ext.Utils.Print("Teleporting " .. character .. " to player: " .. playerCharacter)
-        if CanFollow() then
-            Osi.PROC_Follow(character, playerCharacter)
+        local success = SafeOsiCall(Osi.TeleportTo, character, playerCharacter)
+        if success then
+            DebugLog("Teleported " .. character .. " to player: " .. playerCharacter, "TELEPORT")
+            if CanFollow() then
+                SafeOsiCall(Osi.PROC_Follow, character, playerCharacter)
+            end
         end
     end
 end
@@ -707,14 +709,18 @@ local controllerToStatusTranslator = {
 --- @return boolean success True if a status was applied, false otherwise
 local function ApplyStatusFromControllerBuff(character)
     for controllerBuff, status in pairs(controllerToStatusTranslator) do
-        if Osi.HasActiveStatus(character, controllerBuff) == 1 then
-            if Osi.HasActiveStatus(character, "ToggleIsNPC") == 1 then
+        local success, hasStatus = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
+        if success and hasStatus == 1 then
+            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, "ToggleIsNPC")
+            if success2 and hasNPC == 1 then
                 status = status .. '_NPC'
-                Osi.MakeNPC(character)
+                SafeOsiCall(Osi.MakeNPC, character)
             end
-            Osi.ApplyStatus(character, status, -1)
-            Ext.Utils.Print("Applied " .. status .. " to " .. character)
-            return true
+            local applySuccess = SafeOsiCall(Osi.ApplyStatus, character, status, -1)
+            if applySuccess then
+                DebugLog("Applied " .. status .. " to " .. character, "STATUS")
+                return true
+            end
         end
     end
     return false
@@ -797,17 +803,19 @@ end)
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function (object, status, causee, storyActionID)
     if status == 'AI_ALLIES_POSSESSED' then
         local hostCharacter = Osi.GetHostCharacter()
-        Osi.AddPartyFollower(object, hostCharacter)
-        Ext.Utils.Print("Possessed: " .. object)
+        local success = SafeOsiCall(Osi.AddPartyFollower, object, hostCharacter)
+        if success then
+            DebugLog("Possessed: " .. object, "POSSESSION")
+        end
     end
 end)
 
 Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function (object, status, causee, storyActionID)
     if status == 'AI_ALLIES_POSSESSED' then
         local hostCharacter = Osi.GetHostCharacter()
-        Osi.RemovePartyFollower(object, hostCharacter)
-        Ext.Utils.Print("Stopped Possessing: " .. object)
-        Osi.ApplyStatus(object, "AI_CANCEL", 0)
+        SafeOsiCall(Osi.RemovePartyFollower, object, hostCharacter)
+        DebugLog("Stopped Possessing: " .. object, "POSSESSION")
+        SafeOsiCall(Osi.ApplyStatus, object, "AI_CANCEL", 0)
     end
 end)
 
@@ -860,11 +868,15 @@ end)
 -- Function to apply status based on controller buff for non-NPCs
 local function ApplyStatusBasedOnBuff(character)
     for controllerBuff, status in pairs(controllerToStatusTranslator) do
-        if Osi.HasActiveStatus(character, controllerBuff) == 1 then
-            if Osi.HasActiveStatus(character, "ToggleIsNPC") == 0 then
-                Osi.ApplyStatus(character, status, -1)
-                Ext.Utils.Print("Applied " .. status .. " to " .. character)
-                return status
+        local success1, hasController = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
+        if success1 and hasController == 1 then
+            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, "ToggleIsNPC")
+            if success2 and hasNPC == 0 then
+                local applySuccess = SafeOsiCall(Osi.ApplyStatus, character, status, -1)
+                if applySuccess then
+                    DebugLog("Applied " .. status .. " to " .. character, "STATUS")
+                    return status
+                end
             end
         end
     end
@@ -886,8 +898,10 @@ Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
     if not hasAnyNPCStatus(character) then
         local status = Mods.AIAllies.appliedStatuses[character]
         if status then
-            Osi.RemoveStatus(character, status, character)
-            Ext.Utils.Print("Removed " .. status .. " from " .. character)
+            local success = SafeOsiCall(Osi.RemoveStatus, character, status, character)
+            if success then
+                DebugLog("Removed " .. status .. " from " .. character, "TURN")
+            end
             Mods.AIAllies.appliedStatuses[character] = nil
         end
     end
@@ -916,13 +930,19 @@ local function ModifyAISpells(character, addSpell)
     end
     
     for originalSpell, aiSpell in pairs(spellMappings) do
-        local hasAIVersion = Osi.HasSpell(character, aiSpell) == 1
+        local success, hasAIVersion = SafeOsiCall(Osi.HasSpell, character, aiSpell)
+        if not success then
+            hasAIVersion = false
+        else
+            hasAIVersion = hasAIVersion == 1
+        end
 
-        if Osi.HasSpell(character, originalSpell) == 1 then
+        local success2, hasOriginal = SafeOsiCall(Osi.HasSpell, character, originalSpell)
+        if success2 and hasOriginal == 1 then
             if addSpell and not hasAIVersion then
-                Osi.AddSpell(character, aiSpell, 0, 0)
+                SafeOsiCall(Osi.AddSpell, character, aiSpell, 0, 0)
             elseif not addSpell and hasAIVersion then
-                Osi.RemoveSpell(character, aiSpell, 0)
+                SafeOsiCall(Osi.RemoveSpell, character, aiSpell, 0)
             end
         end
     end
@@ -1013,14 +1033,18 @@ local function HandleDialogActorJoined(instanceID, actor)
     
     if instanceID == relevantDialogInstance and IsCurrentAlly(actorUuid) and HasRelevantStatus(actor) then
         -- Preserve faction before making player
-        local originalFaction = Osi.GetFaction(actor)
-        transformedCompanions[actorUuid] = {
-            wasNPC = true,
-            faction = originalFaction
-        }
-        
-        Osi.MakePlayer(actor)
-        Ext.Utils.Print("Temporarily turned " .. actor .. " into a player for dialog instance " .. tostring(instanceID))
+        local success, originalFaction = SafeOsiCall(Osi.GetFaction, actor)
+        if success then
+            transformedCompanions[actorUuid] = {
+                wasNPC = true,
+                faction = originalFaction
+            }
+            
+            local makePlayerSuccess = SafeOsiCall(Osi.MakePlayer, actor)
+            if makePlayerSuccess then
+                DebugLog("Temporarily turned " .. actor .. " into a player for dialog instance " .. tostring(instanceID), "DIALOG")
+            end
+        end
     end
 end
 
@@ -1032,18 +1056,26 @@ local function HandleDialogEnded(dialog, instanceID)
     if instanceID == relevantDialogInstance then
         for actorUuid, data in pairs(transformedCompanions) do
             -- Validate entity still exists
-            if Osi.Exists(actorUuid) ~= 1 then
+            local success, exists = SafeOsiCall(Osi.Exists, actorUuid)
+            if not success or exists ~= 1 then
                 Ext.Utils.Print("[WARNING] Actor " .. actorUuid .. " no longer exists, skipping reversion")
-            elseif Osi.IsInCombat(actorUuid) == 0 then
-                Ext.Utils.Print("Character " .. actorUuid .. " is not in combat, remaining as player character after dialog end.")
             else
-                Osi.MakeNPC(actorUuid)
-                -- Restore original faction
-                if type(data) == "table" and data.faction then
-                    Osi.SetFaction(actorUuid, data.faction)
-                    Ext.Utils.Print("[FACTION] Restored faction for " .. actorUuid .. " to " .. data.faction)
+                local success2, inCombat = SafeOsiCall(Osi.IsInCombat, actorUuid)
+                if success2 and inCombat == 0 then
+                    DebugLog("Character " .. actorUuid .. " is not in combat, remaining as player character after dialog end.", "DIALOG")
+                else
+                    local makeNPCSuccess = SafeOsiCall(Osi.MakeNPC, actorUuid)
+                    if makeNPCSuccess then
+                        -- Restore original faction
+                        if type(data) == "table" and data.faction then
+                            local factionSuccess = SafeOsiCall(Osi.SetFaction, actorUuid, data.faction)
+                            if factionSuccess then
+                                DebugLog("[FACTION] Restored faction for " .. actorUuid .. " to " .. data.faction, "DIALOG")
+                            end
+                        end
+                        DebugLog("Reverted " .. actorUuid .. " back to NPC after dialog end in instance " .. tostring(instanceID), "DIALOG")
+                    end
                 end
-                Ext.Utils.Print("Reverted " .. actorUuid .. " back to NPC after dialog end in instance " .. tostring(instanceID))
             end
         end
         transformedCompanions = {}
@@ -1058,8 +1090,10 @@ function TeleportAlliesToCaster(caster)
     local target = Osi.GetHostCharacter()
     for uuid, _ in pairs(CurrentAllies) do
         if CurrentAllies[uuid] then
-            Osi.TeleportTo(uuid, target, "", 1, 1, 1, 0, 1)
-            Ext.Utils.Print("Teleporting ally: " .. uuid)
+            local success = SafeOsiCall(Osi.TeleportTo, uuid, target, "", 1, 1, 1, 0, 1)
+            if success then
+                DebugLog("Teleporting ally: " .. uuid, "TELEPORT")
+            end
         end
     end
 end
@@ -1090,9 +1124,9 @@ local function SafelyUpdateFactionStore(character, newFaction)
     if not originalFactions[character] then
         originalFactions[character] = newFaction
         Mods.AIAllies.PersistentVars.originalFactions = originalFactions
-        Ext.Utils.Print("Original faction saved for " .. character .. ": " .. newFaction)
+        DebugLog("Original faction saved for " .. character .. ": " .. newFaction, "FACTION")
     else
-        Ext.Utils.Print("Original faction for " .. character .. " already set to: " .. originalFactions[character])
+        DebugLog("Original faction for " .. character .. " already set to: " .. originalFactions[character], "FACTION")
     end
 end
 
@@ -1104,17 +1138,24 @@ end
 -- Faction Debug
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, target, spell, spellType, spellElement, storyActionID)
     if spell == "G_Target_Allies_Faction" then
-        local casterFaction = Osi.GetFaction(caster)
-        local targetFaction = Osi.GetFaction(target)
+        local success1, casterFaction = SafeOsiCall(Osi.GetFaction, caster)
+        local success2, targetFaction = SafeOsiCall(Osi.GetFaction, target)
         local hostCharacter = Osi.GetHostCharacter()
 
-        SafelyUpdateFactionStore(hostCharacter, getCleanFactionID(Osi.GetFaction(hostCharacter)))
+        if success1 and success2 and hostCharacter then
+            local success3, hostFaction = SafeOsiCall(Osi.GetFaction, hostCharacter)
+            if success3 then
+                SafelyUpdateFactionStore(hostCharacter, getCleanFactionID(hostFaction))
+            end
 
-        Ext.Utils.Print("Caster's current faction: " .. casterFaction)
-        Ext.Utils.Print("Target's faction: " .. targetFaction)
+            DebugLog("Caster's current faction: " .. casterFaction, "FACTION")
+            DebugLog("Target's faction: " .. targetFaction, "FACTION")
 
-        Osi.SetFaction(hostCharacter, getCleanFactionID(targetFaction))
-        Ext.Utils.Print("Changed faction of " .. hostCharacter .. " to " .. getCleanFactionID(targetFaction))
+            local setSuccess = SafeOsiCall(Osi.SetFaction, hostCharacter, getCleanFactionID(targetFaction))
+            if setSuccess then
+                DebugLog("Changed faction of " .. hostCharacter .. " to " .. getCleanFactionID(targetFaction), "FACTION")
+            end
+        end
     end
 end)
 
@@ -1123,8 +1164,10 @@ Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function (caster, 
         local hostCharacter = Osi.GetHostCharacter()
         local originalFaction = originalFactions[hostCharacter] or "6545a015-1b3d-66a4-6a0e-6ec62065cdb7"
 
-        Osi.SetFaction(hostCharacter, getCleanFactionID(originalFaction))
-        Ext.Utils.Print("Reverted faction of " .. hostCharacter .. " to " .. getCleanFactionID(originalFaction))
+        local success = SafeOsiCall(Osi.SetFaction, hostCharacter, getCleanFactionID(originalFaction))
+        if success then
+            DebugLog("Reverted faction of " .. hostCharacter .. " to " .. getCleanFactionID(originalFaction), "FACTION")
+        end
     end
 end)
 ------------------------------------------------------------------------------------------------
