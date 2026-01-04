@@ -218,8 +218,7 @@ function AI.ApplyStatusBasedOnBuff(character)
                 else
                     DebugLog("[ERROR] Failed to apply status " .. status .. " to " .. character, "STATUS")
                 end
-                    return status
-                end
+                return status
             end
         end
     end

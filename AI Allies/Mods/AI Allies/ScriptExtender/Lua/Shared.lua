@@ -81,15 +81,13 @@ end
 
 --- Throttle event processing to prevent spam
 --- @param eventKey string Unique key for the event type
---- @param callback function Function to execute if throttle allows
---- @return boolean True if event was processed, false if throttled
-function Shared.ThrottleEvent(eventKey, callback)
+--- @return boolean True if event should be processed, false if throttled
+function Shared.ThrottleEvent(eventKey)
     local currentTime = Ext.Utils.MonotonicTime()
     local lastTime = eventThrottle[eventKey] or 0
     
     if currentTime - lastTime >= Shared.CONSTANTS.EVENT_THROTTLE_DELAY then
         eventThrottle[eventKey] = currentTime
-        callback()
         return true
     end
     return false

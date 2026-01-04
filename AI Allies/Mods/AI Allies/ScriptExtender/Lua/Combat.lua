@@ -147,19 +147,19 @@ function Combat.RegisterListeners(CurrentAllies)
     
     -- TurnStarted: Apply status based on controller buff (throttled)
     Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(character)
-        ThrottleEvent("TurnStarted_" .. character, function()
+        if ThrottleEvent("TurnStarted_" .. character) then
             if not AI.hasAnyNPCStatus(character) then
                 local status = AI.ApplyStatusBasedOnBuff(character)
                 if status then
                     Mods.AIAllies.appliedStatuses[character] = status
                 end
             end
-        end)
+        end
     end)
     
     -- TurnEnded: Remove temporary status (throttled)
     Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
-        ThrottleEvent("TurnEnded_" .. character, function()
+        if ThrottleEvent("TurnEnded_" .. character) then
             if not AI.hasAnyNPCStatus(character) then
                 local status = Mods.AIAllies.appliedStatuses[character]
                 if status then
@@ -170,7 +170,7 @@ function Combat.RegisterListeners(CurrentAllies)
                     Mods.AIAllies.appliedStatuses[character] = nil
                 end
             end
-        end)
+        end
     end)
     
     -- Safety mechanism: Force resume combat if paused too long

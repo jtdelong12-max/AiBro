@@ -3,6 +3,7 @@
 -- Formation positioning system for AI Allies
 -- =============================================================================
 
+local Shared = Ext.Require("Shared.lua")
 Formations = {}
 
 -- Formation tracking

@@ -3,6 +3,8 @@
 -- Advanced AI features including aggression modes, auto-heal, and spell priorities
 -- =============================================================================
 
+local Shared = Ext.Require("Shared.lua")
+local AI = Ext.Require("AI.lua")
 AdvancedFeatures = {}
 
 -- Tracking tables

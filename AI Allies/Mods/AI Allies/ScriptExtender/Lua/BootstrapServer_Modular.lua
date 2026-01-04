@@ -63,6 +63,10 @@ Mods.AIAllies.appliedStatuses = {}
 Mods.AIAllies.combatTimers = {}
 Mods.AIAllies.combatStartTimes = {}
 
+-- Export BootstrapServer for global module access
+BootstrapServer = BootstrapServer or {}
+BootstrapServer.CurrentAllies = CurrentAllies
+
 ----------------------------------------------------------------------------------
 -- Ally Management Functions
 ----------------------------------------------------------------------------------
