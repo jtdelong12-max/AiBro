@@ -169,6 +169,20 @@ function MCM.InitializeAll()
                 Osi.AddPassive(character, PASSIVE.ALLIES_TOGGLE_NPC)
                 Ext.Utils.Print("Given '" .. PASSIVE.ALLIES_TOGGLE_NPC .. "' to: " .. character)
             end
+            
+            -- Grant AI Tactics toggleable passives
+            if Osi.HasPassive(character, PASSIVE.AI_MODE_AGGRESSIVE) == 0 then
+                Osi.AddPassive(character, PASSIVE.AI_MODE_AGGRESSIVE)
+                Ext.Utils.Print("Given '" .. PASSIVE.AI_MODE_AGGRESSIVE .. "' to: " .. character)
+            end
+            if Osi.HasPassive(character, PASSIVE.AI_MODE_CONSERVATIVE) == 0 then
+                Osi.AddPassive(character, PASSIVE.AI_MODE_CONSERVATIVE)
+                Ext.Utils.Print("Given '" .. PASSIVE.AI_MODE_CONSERVATIVE .. "' to: " .. character)
+            end
+            if Osi.HasPassive(character, PASSIVE.AI_MODE_AUTOHEAL) == 0 then
+                Osi.AddPassive(character, PASSIVE.AI_MODE_AUTOHEAL)
+                Ext.Utils.Print("Given '" .. PASSIVE.AI_MODE_AUTOHEAL .. "' to: " .. character)
+            end
         end
     end
     

@@ -389,7 +389,12 @@ Shared.PASSIVE = {
     -- Advanced feature passives
     UNLOCK_ADVANCED_AI = "UnlockAdvancedAI",
     UNLOCK_AUTO_HEAL = "UnlockAutoHeal",
-    UNLOCK_AGGRESSION_MODES = "UnlockAggressionModes"
+    UNLOCK_AGGRESSION_MODES = "UnlockAggressionModes",
+    
+    -- AI Tactics toggleable passives
+    AI_MODE_AGGRESSIVE = "Passive_AI_Mode_Aggressive",
+    AI_MODE_CONSERVATIVE = "Passive_AI_Mode_Conservative",
+    AI_MODE_AUTOHEAL = "Passive_AI_Mode_AutoHeal"
 }
 
 return Shared

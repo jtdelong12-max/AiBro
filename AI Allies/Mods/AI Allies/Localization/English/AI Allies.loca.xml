@@ -128,4 +128,10 @@
 	<content contentuid="h_Target_Allies_Support_Desc" version="1">Summon a utility caster to buff allies and control the battlefield.</content>
 	<content contentuid="h_Target_Allies_Controller_Name" version="1">Summon Controller</content>
 	<content contentuid="h_Target_Allies_Controller_Desc" version="1">Summon a spellcaster focused on crowd control and locking down enemies.</content>
+	<content contentuid="h_Passive_Aggressive_Name" version="1">AI Mode: Aggressive</content>
+	<content contentuid="h_Passive_Aggressive_Desc" version="1">Toggle On: The ally will prioritize damage output and pushing forward, often ignoring safety.</content>
+	<content contentuid="h_Passive_Conservative_Name" version="1">AI Mode: Conservative</content>
+	<content contentuid="h_Passive_Conservative_Desc" version="1">Toggle On: The ally will prioritize survival, staying near teammates, and defensive positioning.</content>
+	<content contentuid="h_Passive_AutoHeal_Name" version="1">AI Logic: Auto-Heal</content>
+	<content contentuid="h_Passive_AutoHeal_Desc" version="1">Toggle On: Forces the ally to prioritize healing spells when a teammate drops below 50% HP.</content>
 </contentList>

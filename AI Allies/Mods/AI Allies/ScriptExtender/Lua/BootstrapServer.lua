@@ -19,6 +19,7 @@ local Shared = Ext.Require("Shared.lua")
 local AI = Ext.Require("AI.lua")
 local Combat = Ext.Require("Combat.lua")
 local Eldertide = Ext.Require("Eldertide.lua")
+local Tactics = Ext.Require("Tactics.lua")
 
 -- Import shared constants and utilities (single source of truth)
 local CONSTANTS = Shared.CONSTANTS
@@ -1196,3 +1197,8 @@ end)
 -- Eldertide Armaments Integration
 ----------------------------------------------------------------------------------
 Eldertide.RegisterListeners()
+
+----------------------------------------------------------------------------------
+-- AI Tactics Management
+----------------------------------------------------------------------------------
+Tactics.RegisterListeners()
