@@ -147,8 +147,11 @@ end
 ----------------------------------------------------------------------------------
 -- Helper Functions
 ----------------------------------------------------------------------------------
---- Check if character has any AI combat status
---- Uses hash set for O(1) status validation instead of O(n) array iteration
+--- Check if character has any AI combat status active
+--- Note: Must iterate through statuses because we need to query the game engine
+--- for each status. The combatStatusSet is used for validating status names (O(1)).
+--- @param character string Character UUID
+--- @return boolean True if character has any AI combat status
 function AI.hasAnyAICombatStatus(character)
     for _, status in ipairs(AI.aiCombatStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
@@ -158,7 +161,10 @@ function AI.hasAnyAICombatStatus(character)
     return false
 end
 
---- Check if character has any NPC status
+--- Check if character has any NPC status active
+--- Note: Must iterate because we need to query the game engine for each status.
+--- @param character string Character UUID
+--- @return boolean True if character has any NPC status
 function AI.hasAnyNPCStatus(character)
     for _, status in ipairs(AI.NPCStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
