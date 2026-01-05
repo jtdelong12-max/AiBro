@@ -128,15 +128,27 @@ AI.controllerToStatusTranslator = {
     [STATUS.TANK_CONTROLLER] = STATUS.TANK,
     [STATUS.CONTROLLER_CONTROLLER] = STATUS.CONTROLLER
 }
-    [STATUS.CUSTOM_CONTROLLER_4] = STATUS.CUSTOM_4,
-    [STATUS.THROWER_CONTROLLER] = STATUS.THROWER,
-    [STATUS.DEFAULT_CONTROLLER] = STATUS.DEFAULT,
-    [STATUS.TRICKSTER_CONTROLLER] = STATUS.TRICKSTER
-}
+
+----------------------------------------------------------------------------------
+-- Performance Optimization: Create hash sets for O(1) lookups
+----------------------------------------------------------------------------------
+-- Hash set for controller statuses (O(1) lookup vs O(n) array iteration)
+local controllerStatusSet = {}
+for _, status in ipairs(AI.aiStatuses) do
+    controllerStatusSet[status] = true
+end
+
+-- Hash set for combat statuses (O(1) lookup vs O(n) array iteration)
+local combatStatusSet = {}
+for _, status in ipairs(AI.aiCombatStatuses) do
+    combatStatusSet[status] = true
+end
 
 ----------------------------------------------------------------------------------
 -- Helper Functions
 ----------------------------------------------------------------------------------
+--- Check if character has any AI combat status
+--- Uses hash set for O(1) status validation instead of O(n) array iteration
 function AI.hasAnyAICombatStatus(character)
     for _, status in ipairs(AI.aiCombatStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
@@ -146,6 +158,7 @@ function AI.hasAnyAICombatStatus(character)
     return false
 end
 
+--- Check if character has any NPC status
 function AI.hasAnyNPCStatus(character)
     for _, status in ipairs(AI.NPCStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
@@ -155,13 +168,18 @@ function AI.hasAnyNPCStatus(character)
     return false
 end
 
+--- Check if a status is a controller status (O(1) lookup)
+--- @param status string The status to check
+--- @return boolean True if status is a controller status
 function AI.isControllerStatus(status)
-    for _, brainStatus in ipairs(AI.aiStatuses) do
-        if brainStatus == status then
-            return true
-        end
-    end
-    return false
+    return controllerStatusSet[status] == true
+end
+
+--- Check if a status is a combat status (O(1) lookup)
+--- @param status string The status to check
+--- @return boolean True if status is a combat status
+function AI.isCombatStatus(status)
+    return combatStatusSet[status] == true
 end
 
 --- Check if character has a controller status with optional brain type filter

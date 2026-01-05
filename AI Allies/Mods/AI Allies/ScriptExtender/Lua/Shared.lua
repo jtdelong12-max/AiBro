@@ -123,9 +123,22 @@ end
 ----------------------------------------------------------------------------------
 -- Multiplayer Support Functions
 ----------------------------------------------------------------------------------
---- Get all player characters in the party
+-- Performance Optimization: Cache player list
+local playerCache = nil
+local playerCacheTimer = 0
+local PLAYER_CACHE_REFRESH = 500  -- Refresh player cache every 500ms
+
+--- Get all player characters in the party (with caching)
 --- @return table Array of player character UUIDs
 function Shared.GetAllPlayers()
+    local currentTime = Ext.Utils.MonotonicTime()
+    
+    -- Return cached result if still valid
+    if playerCache ~= nil and (currentTime - playerCacheTimer) < PLAYER_CACHE_REFRESH then
+        return playerCache
+    end
+    
+    -- Refresh cache
     local players = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
     for _, member in pairs(partyMembers) do
@@ -134,7 +147,16 @@ function Shared.GetAllPlayers()
             table.insert(players, character)
         end
     end
+    
+    playerCache = players
+    playerCacheTimer = currentTime
     return players
+end
+
+--- Clear the player cache (call when party composition changes)
+function Shared.ClearPlayerCache()
+    playerCache = nil
+    playerCacheTimer = 0
 end
 
 --- Get the player character who owns/summoned an entity
