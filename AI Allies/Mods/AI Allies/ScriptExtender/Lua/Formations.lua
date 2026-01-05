@@ -257,7 +257,7 @@ function Formations.RegisterListeners()
     Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function(timerName)
         if timerName == "Formations_Update" then
             Formations.UpdateFormations()
-            Osi.StartTimer("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
+            Osi.TimerLaunch("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
         end
     end)
     
@@ -267,7 +267,7 @@ end
 --- Initialize formation system
 function Formations.Initialize()
     -- Start periodic update timer
-    Osi.StartTimer("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
+    Osi.TimerLaunch("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
     Shared.DebugLog("Formation", "Formation system initialized")
 end
 
