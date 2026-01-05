@@ -134,4 +134,8 @@
 	<content contentuid="h_Passive_Conservative_Desc" version="1">Toggle On: The ally will prioritize survival, staying near teammates, and defensive positioning.</content>
 	<content contentuid="h_Passive_AutoHeal_Name" version="1">AI Logic: Auto-Heal</content>
 	<content contentuid="h_Passive_AutoHeal_Desc" version="1">Toggle On: Forces the ally to prioritize healing spells when a teammate drops below 50% HP.</content>
+	<content contentuid="h_Target_Allies_Default_Name" version="1">Default Archetype</content>
+	<content contentuid="h_Target_Allies_Default_Desc" version="1">Resets the character to their default game behavior and removes AI control.</content>
+	<content contentuid="h_Target_Allies_Summons_Name" version="1">Toggle Summon AI</content>
+	<content contentuid="h_Target_Allies_Summons_Desc" version="1">Enables or disables AI control for summoned creatures.</content>
 </contentList>

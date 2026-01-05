@@ -143,43 +143,40 @@ function AdvancedFeatures.GetAggressionMultiplier(entity)
     return Shared.CONSTANTS.AGGRESSION_LEVEL_DEFAULT
 end
 
---- Handle auto-heal for allies in combat
---- This should be called on turn events
---- @param entity string Entity UUID
-function AdvancedFeatures.ProcessAutoHeal(entity)
-    if not entity or not Shared.CachedExists(entity) then
-        return
-    end
+--- Handle healer logic on turn start
+--- @param entity string The character starting their turn (potential Healer)
+function AdvancedFeatures.ProcessHealerLogic(entity)
+    if not entity or Shared.CachedExists(entity) ~= 1 then return end
     
-    if not AdvancedFeatures.NeedsHealing(entity) then
-        return
+    -- 1. Check if this entity is a Healer (Has Healer status or Auto-Heal enabled)
+    local isHealer = false
+    if AdvancedFeatures.IsAutoHealEnabled(entity) then isHealer = true end
+    if AI and AI.hasControllerStatus and (AI.hasControllerStatus(entity, "HEALER") or AI.hasControllerStatus(entity, "SUPPORT")) then
+        isHealer = true
     end
+    if not isHealer then return end
     
-    -- Safety check for CurrentAllies
-    if not BootstrapServer or not BootstrapServer.CurrentAllies then
-        Shared.DebugLog("AdvancedFeatures", "[ERROR] CurrentAllies not available for auto-heal")
-        return
-    end
-    
-    -- Find allies who can heal
-    local healersFound = 0
-    for ally, _ in pairs(BootstrapServer.CurrentAllies) do
-        if Shared.CachedExists(ally) and ally ~= entity then
-            -- Check if ally is a healer archetype
-            if AI and AI.hasControllerStatus then
-                if AI.hasControllerStatus(ally, "HEALER") then
-                    healersFound = healersFound + 1
-                    Shared.DebugLog("AdvancedFeatures", string.format("[AUTO-HEAL] %s needs healing (%.0f%%), healer %s identified",
-                        entity,
-                        (Osi.GetHitpoints(entity) / Osi.GetMaxHitpoints(entity)) * 100,
-                        ally))
-                end
+    -- 2. Scan PARTY MEMBERS for low HP (Standard AI ignores players sometimes, this forces a check)
+    -- We use Osi.DB_PartOfTheTeam to find everyone, including the Player
+    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
+    for _, member in pairs(partyMembers) do
+        local target = member[1]
+        
+        -- Don't heal enemies or dead people
+        if Shared.CachedExists(target) == 1 and Osi.IsDead(target) == 0 and Osi.IsEnemy(entity, target) == 0 then
+            
+            -- Check HP Threshold (50%)
+            local hp = Osi.GetHitpoints(target)
+            local maxHp = Osi.GetMaxHitpoints(target)
+            
+            if hp and maxHp and maxHp > 0 and (hp / maxHp) < Shared.CONSTANTS.AUTO_HEAL_THRESHOLD then
+                Shared.DebugLog("AdvancedFeatures", string.format("[AUTO-HEAL] %s detected injured ally: %s (%.0f%%)", entity, target, (hp/maxHp)*100))
+                
+                -- OPTIONAL: Apply a temporary status to the TARGET that encourages AI to heal them
+                -- This effectively "taunts" the healer's AI to target this friend
+                Osi.ApplyStatus(target, "AI_HELPER_AVATAR", 6.0, 1, entity) 
             end
         end
-    end
-    
-    if healersFound == 0 then
-        Shared.DebugLog("AdvancedFeatures", "[WARNING] Entity " .. entity .. " needs healing but no healers available")
     end
 end
 
@@ -203,18 +200,14 @@ function AdvancedFeatures.HandleAggressionSpell(caster, target, spell)
     end
 end
 
---- Handle advanced feature event on turn start
---- @param entity string Entity UUID
+--- Updated Turn Handler
 function AdvancedFeatures.OnTurnStarted(entity)
-    -- Don't process events too frequently
     if not Shared.ThrottleEvent("AdvancedFeatures_Turn_" .. entity) then
         return
     end
     
-    -- Process auto-heal
-    if AdvancedFeatures.IsAutoHealEnabled(entity) then
-        AdvancedFeatures.ProcessAutoHeal(entity)
-    end
+    -- Run the corrected Healer Logic
+    AdvancedFeatures.ProcessHealerLogic(entity)
 end
 
 --- Register advanced features event listeners
