@@ -81,7 +81,7 @@ Mods.AIAllies.Debug = CONSTANTS.DEBUG_MODE
 -- This consolidation reduces memory usage by ~3KB and ensures data consistency.
 ----------------------------------------------------------------------------------
 
-Mods.AIAllies.PersistentVars= Mods.AIAllies.PersistentVars or {}
+Mods.AIAllies.PersistentVars = Mods.AIAllies.PersistentVars or {}
 Mods.AIAllies.PersistentVars.firstTimeRewardGiven = Mods.AIAllies.PersistentVars.firstTimeRewardGiven or false
 
 -- Store factions for AI control

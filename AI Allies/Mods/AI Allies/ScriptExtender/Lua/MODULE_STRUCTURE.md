@@ -362,7 +362,7 @@ AI.controllerToStatusTranslator = {
 
 ```
 ScriptExtender/Lua/
-├── BootstrapServer.lua           (Main coordinator - ~1200 lines, optimized)
+├── BootstrapServer.lua           (Main coordinator - ~1190 lines, optimized from ~1550)
 ├── Shared.lua                    (Core utilities - 230 lines)
 ├── AI.lua                        (Archetype management - 200 lines)
 ├── MCM.lua                       (Settings management - 170 lines)
