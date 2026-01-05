@@ -136,25 +136,20 @@ end)
 ----------------------------------------------------------------------------------
 -- Register Module Listeners
 ----------------------------------------------------------------------------------
--- Defer Osiris-dependent registrations until after story is loaded
-Ext.Events.StoryLoaded:Subscribe(function()
-    MCM.RegisterListeners(ModuleUUID)
-    Combat.RegisterListeners(CurrentAllies)
-    Combat.RegisterSwarmListeners()
-    Timer.RegisterListeners(CurrentAllies)
-    Dialog.RegisterListeners(CurrentAllies)
-    Features.RegisterListeners(CurrentAllies)
-    Formations.RegisterListeners()
-    AdvancedFeatures.RegisterListeners()
-    Eldertide.RegisterListeners()
-    Tactics.RegisterListeners()
-    
-    -- Initialize new modules
-    Formations.Initialize()
-    AdvancedFeatures.Initialize()
-    
-    Ext.Utils.Print("[AI Allies] All module listeners registered after StoryLoaded")
-end)
+MCM.RegisterListeners(ModuleUUID)
+Combat.RegisterListeners(CurrentAllies)
+Combat.RegisterSwarmListeners()
+Timer.RegisterListeners(CurrentAllies)
+Dialog.RegisterListeners(CurrentAllies)
+Features.RegisterListeners(CurrentAllies)
+Formations.RegisterListeners()
+AdvancedFeatures.RegisterListeners()
+Eldertide.RegisterListeners()
+Tactics.RegisterListeners()
+
+-- Initialize new modules
+Formations.Initialize()
+AdvancedFeatures.Initialize()
 
 ----------------------------------------------------------------------------------
 -- Module Initialization Complete
