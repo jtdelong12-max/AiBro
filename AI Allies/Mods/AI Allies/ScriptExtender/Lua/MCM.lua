@@ -11,51 +11,20 @@ local PASSIVE = Shared.PASSIVE
 local DebugLog = Shared.DebugLog
 
 ----------------------------------------------------------------------------------
--- Performance Optimization: Cached Player List
--- Avoids repeated DB_PartOfTheTeam queries when processing multiple settings
-----------------------------------------------------------------------------------
-local cachedPlayers = nil
-local cacheTimestamp = 0
-local CACHE_DURATION = 100  -- Cache players for 100ms (covers batch operations)
-
---- Get cached player list to avoid repeated database queries
---- @return table Array of player entries from DB_PartOfTheTeam
-local function GetCachedPlayers()
-    local currentTime = Ext.Utils.MonotonicTime()
-    
-    -- Refresh cache if expired
-    if currentTime - cacheTimestamp > CACHE_DURATION or cachedPlayers == nil then
-        cachedPlayers = Osi.DB_PartOfTheTeam:Get(nil)
-        cacheTimestamp = currentTime
-    end
-    
-    return cachedPlayers
-end
-
---- Clear the player cache (call after batch operations complete)
-local function ClearPlayerCache()
-    cachedPlayers = nil
-    cacheTimestamp = 0
-end
-
-----------------------------------------------------------------------------------
 -- MCM Management Functions
 ----------------------------------------------------------------------------------
 --- Generic function to manage MCM-controlled passives
---- Uses cached player list to avoid repeated database queries
 --- @param settingKey string The MCM setting key to check
 --- @param passiveName string The passive ability name to add/remove
 --- @param inverted boolean If true, passive is removed when setting is enabled
 local function ManageMCMPassive(settingKey, passiveName, inverted)
     inverted = inverted or false
     
-    -- Use cached player list for performance
-    local players = GetCachedPlayers()
-    
     if Mods.BG3MCM then
         local setting = Mods.BG3MCM.MCMAPI:GetSettingValue(settingKey, MCM.ModuleUUID)
         local shouldHavePassive = inverted and not setting or not inverted and setting
         
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         for _, player in pairs(players) do
             local character = player[1]
             local hasPassive = Osi.HasPassive(character, passiveName) == 1
@@ -68,6 +37,7 @@ local function ManageMCMPassive(settingKey, passiveName, inverted)
         end
     else
         -- If MCM is not available, ensure players have default passives
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         for _, player in pairs(players) do
             local character = player[1]
             if Osi.HasPassive(character, passiveName) == 0 and not inverted then
@@ -103,11 +73,9 @@ function MCM.ManageAlliesSwarm()
 end
 
 function MCM.ManageOrderSpellsPassive()
-    -- Use cached player list for performance
-    local players = GetCachedPlayers()
-    
     if Mods.BG3MCM then
         local enableBonus = Mods.BG3MCM.MCMAPI:GetSettingValue("enableOrdersBonusAction", MCM.ModuleUUID)
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         
         for _, player in pairs(players) do
             local character = player[1]
@@ -128,6 +96,7 @@ function MCM.ManageOrderSpellsPassive()
             end
         end
     else
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         for _, player in pairs(players) do
             local character = player[1]
             if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_ORDERS) == 0 then
@@ -138,11 +107,9 @@ function MCM.ManageOrderSpellsPassive()
 end
 
 function MCM.ManageDebugSpells()
-    -- Use cached player list for performance
-    local players = GetCachedPlayers()
-    
     if Mods.BG3MCM then
         local enableDebug = Mods.BG3MCM.MCMAPI:GetSettingValue("enableDebugSpells", MCM.ModuleUUID)
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         
         for _, player in pairs(players) do
             local character = player[1]
@@ -163,6 +130,7 @@ function MCM.ManageDebugSpells()
             end
         end
     else
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
         for _, player in pairs(players) do
             local character = player[1]
             if Osi.HasPassive(character, PASSIVE.UNLOCK_ALLIES_EXTRA_SPELLS) == 0 then
@@ -176,10 +144,8 @@ function MCM.ManageDebugSpells()
 end
 
 --- Initialize all MCM settings
---- Uses cached player list to minimize database queries
 function MCM.InitializeAll()
-    -- Use cached player list for all operations
-    local players = GetCachedPlayers()
+    local players = Osi.DB_PartOfTheTeam:Get(nil)
     for _, player in pairs(players) do
         local character = player[1]
         if Osi.IsPlayer(character) == 1 then
@@ -194,7 +160,6 @@ function MCM.InitializeAll()
         end
     end
     
-    -- All these functions will use the cached player list
     MCM.ManageCustomArchetypes()
     MCM.ManageAlliesMind()
     MCM.ManageAlliesDashing()
@@ -203,9 +168,6 @@ function MCM.InitializeAll()
     MCM.ManageAlliesSwarm()
     MCM.ManageOrderSpellsPassive()
     MCM.ManageDebugSpells()
-    
-    -- Clear cache after batch operations complete
-    ClearPlayerCache()
 end
 
 --- Register MCM event listeners

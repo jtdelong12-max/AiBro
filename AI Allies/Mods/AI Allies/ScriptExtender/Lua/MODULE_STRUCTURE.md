@@ -300,25 +300,7 @@ end
 
 **Impact**: Status validation is now **~15-40x faster** depending on list size.
 
-#### 2. Player List Caching (MCM.lua)
-**Before**: Each MCM function called `Osi.DB_PartOfTheTeam:Get(nil)` separately:
-- `InitializeAll()` made 10+ database queries (1 direct + 8 via subfunctions)
-
-**After**: Cached player list with 100ms TTL:
-```lua
-local function GetCachedPlayers()
-    local currentTime = Ext.Utils.MonotonicTime()
-    if currentTime - cacheTimestamp > CACHE_DURATION or cachedPlayers == nil then
-        cachedPlayers = Osi.DB_PartOfTheTeam:Get(nil)
-        cacheTimestamp = currentTime
-    end
-    return cachedPlayers
-end
-```
-
-**Impact**: Database queries reduced from **10+ to 1** during batch operations.
-
-#### 3. Player List Caching (Shared.lua)
+#### 2. Player List Caching (Shared.lua)
 **Before**: `GetAllPlayers()` always queried the database:
 ```lua
 function Shared.GetAllPlayers()
@@ -343,7 +325,7 @@ end
 
 **Impact**: Repeated calls within 500ms return cached results instantly.
 
-#### 4. Bug Fix: Duplicate Code Block (AI.lua)
+#### 3. Bug Fix: Duplicate Code Block (AI.lua)
 **Issue**: Lines 131-135 contained duplicate entries in `controllerToStatusTranslator`:
 ```lua
 AI.controllerToStatusTranslator = {
