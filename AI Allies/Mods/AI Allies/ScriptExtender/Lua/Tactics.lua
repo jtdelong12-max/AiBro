@@ -8,6 +8,17 @@ local Shared = Ext.Require("Shared.lua")
 
 -- Export shared references
 local DebugLog = Shared.DebugLog
+local STATUS = Shared.STATUS
+
+--- Show a short overhead message when a mode changes
+--- @param object string Entity UUID
+--- @param message string Message to display
+local function ShowModeOverhead(object, message)
+    if not object or not message then
+        return
+    end
+    Osi.CharacterShowOverheadText(object, message, 3)
+end
 
 ----------------------------------------------------------------------------------
 -- Exclusive Passive Management
@@ -17,18 +28,22 @@ local DebugLog = Shared.DebugLog
 function Tactics.RegisterListeners()
     -- Listen for Status Application to enforce exclusivity
     Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
-        if status == "ALLIES_AGGRESSIVE" then
+        if status == STATUS.AGGRESSIVE_MODE then
             -- If Aggressive applied, turn off Conservative
             if Osi.HasPassive(object, "Passive_AI_Mode_Conservative") == 1 then
                 Osi.RemovePassive(object, "Passive_AI_Mode_Conservative")
                 DebugLog("Tactics: Removed Conservative mode (Aggressive activated)", "TACTICS")
             end
-        elseif status == "ALLIES_DEFENSIVE" then
+            ShowModeOverhead(object, "Aggressive mode")
+        elseif status == STATUS.DEFENSIVE_MODE then
             -- If Conservative applied, turn off Aggressive
             if Osi.HasPassive(object, "Passive_AI_Mode_Aggressive") == 1 then
                 Osi.RemovePassive(object, "Passive_AI_Mode_Aggressive")
                 DebugLog("Tactics: Removed Aggressive mode (Conservative activated)", "TACTICS")
             end
+            ShowModeOverhead(object, "Defensive mode")
+        elseif status == STATUS.AUTO_HEAL_ENABLED then
+            ShowModeOverhead(object, "Auto-heal enabled")
         end
     end)
     

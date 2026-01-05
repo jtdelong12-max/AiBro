@@ -1,7 +1,8 @@
-----------------------------------------------------------------------------------
--- AI Allies Mod - Main Bootstrap File (Optimized)
--- Uses shared modules to avoid data duplication and improve performance
-----------------------------------------------------------------------------------
+
+-- Redirect legacy bootstrap to the modular implementation
+return Ext.Require("BootstrapServer_Modular.lua")
+
+--[[ Legacy bootstrap retained for reference; redirect above handles loading.
 
 -- Initialize mod namespace
 Mods = Mods or {}
@@ -1202,3 +1203,4 @@ Eldertide.RegisterListeners()
 -- AI Tactics Management
 ----------------------------------------------------------------------------------
 Tactics.RegisterListeners()
+--]]

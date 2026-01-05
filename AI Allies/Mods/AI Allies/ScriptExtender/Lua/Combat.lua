@@ -16,6 +16,42 @@ local SafeOsiCall = Shared.SafeOsiCall
 local CachedExists = Shared.CachedExists
 local ThrottleEvent = Shared.ThrottleEvent
 
+--- Check for downed allies and force a rescue action
+--- @param caster string Entity UUID
+--- @return boolean acted True if a rescue action was issued
+function Combat.CheckForDownedAllies(caster)
+    if Osi.IsPlayer(caster) == 1 then return false end -- Skip real players
+
+    local x, y, z = Osi.GetPosition(caster)
+    local allies = Osi.DB_PartOfTheTeam:Get(nil)
+    for _, entry in pairs(allies) do
+        local ally = entry[1]
+        if ally ~= caster and Osi.IsEnemy(caster, ally) == 0 then
+            -- Check if ally is Downed (0 HP / Knocked Out)
+            if Osi.HasStatus(ally, "DOWNED") == 1 or Osi.HasStatus(ally, "MAG_KO_CONDITION") == 1 then
+                local dist = Osi.GetDistanceTo(caster, ally)
+
+                -- Priority 1: Use HELP (Range 3m)
+                if dist <= 3.0 then
+                    Ext.Utils.Print("[Medic] " .. caster .. " is helping downed ally " .. ally)
+                    Osi.UseSpell(caster, "Target_Help", ally)
+                    return true -- Action taken
+                end
+
+                -- Priority 2: Ranged Heal (Healing Word - Range 18m)
+                -- Only if they actually have the spell
+                if dist <= 18.0 and Osi.HasSpell(caster, "Target_HealingWord") == 1 then
+                    Ext.Utils.Print("[Medic] " .. caster .. " is reviving " .. ally .. " with Healing Word")
+                    Osi.UseSpell(caster, "Target_HealingWord", ally)
+                    return true -- Action taken
+                end
+            end
+        end
+    end
+
+    return false
+end
+
 ----------------------------------------------------------------------------------
 -- Spell Mappings and Modifications
 ----------------------------------------------------------------------------------
@@ -147,6 +183,11 @@ function Combat.RegisterListeners(CurrentAllies)
     
     -- TurnStarted: Apply status based on controller buff (throttled)
     Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(character)
+        -- Run Medic check first; if it acts, skip the rest of the turn logic
+        if Combat.CheckForDownedAllies(character) then
+            return
+        end
+
         if ThrottleEvent("TurnStarted_" .. character) then
             if not AI.hasAnyNPCStatus(character) then
                 local status = AI.ApplyStatusBasedOnBuff(character)
