@@ -134,22 +134,26 @@ Ext.Osiris.RegisterListener("CharacterJoinedParty", 1, "after", function(charact
 end)
 
 ----------------------------------------------------------------------------------
--- Register Module Listeners
+-- Register Module Listeners (Deferred until SessionLoaded to avoid Osiris errors)
 ----------------------------------------------------------------------------------
-MCM.RegisterListeners(ModuleUUID)
-Combat.RegisterListeners(CurrentAllies)
-Combat.RegisterSwarmListeners()
-Timer.RegisterListeners(CurrentAllies)
-Dialog.RegisterListeners(CurrentAllies)
-Features.RegisterListeners(CurrentAllies)
-Formations.RegisterListeners()
-AdvancedFeatures.RegisterListeners()
-Eldertide.RegisterListeners()
-Tactics.RegisterListeners()
-
--- Initialize new modules
-Formations.Initialize()
-AdvancedFeatures.Initialize()
+Ext.Events.SessionLoaded:Subscribe(function()
+    MCM.RegisterListeners(ModuleUUID)
+    Combat.RegisterListeners(CurrentAllies)
+    Combat.RegisterSwarmListeners()
+    Timer.RegisterListeners(CurrentAllies)
+    Dialog.RegisterListeners(CurrentAllies)
+    Features.RegisterListeners(CurrentAllies)
+    Formations.RegisterListeners()
+    AdvancedFeatures.RegisterListeners()
+    Eldertide.RegisterListeners()
+    Tactics.RegisterListeners()
+    
+    -- Initialize new modules
+    Formations.Initialize()
+    AdvancedFeatures.Initialize()
+    
+    Ext.Utils.Print("[AI Allies] All Osiris listeners registered successfully")
+end)
 
 ----------------------------------------------------------------------------------
 -- Module Initialization Complete
