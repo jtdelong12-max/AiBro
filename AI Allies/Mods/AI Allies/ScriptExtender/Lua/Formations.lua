@@ -8,6 +8,7 @@ Formations = {}
 
 -- Formation tracking
 local formationData = {}
+local formationTimerStarted = false
 
 --- Formation types with position offsets
 local FORMATION_TYPES = {
@@ -266,9 +267,24 @@ end
 
 --- Initialize formation system
 function Formations.Initialize()
-    -- Start periodic update timer
-    Osi.TimerLaunch("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
-    Shared.DebugLog("Formation", "Formation system initialized")
+    local function startFormationTimer()
+        if formationTimerStarted then return end
+        formationTimerStarted = true
+        Osi.TimerLaunch("Formations_Update", Shared.CONSTANTS.FORMATION_UPDATE_INTERVAL)
+        Shared.DebugLog("Formation", "Formation system initialized")
+    end
+
+    -- Defer timer start until the game is in a running state to avoid restricted-context errors
+    local state = Ext.Utils.GetGameState()
+    if state == "Running" then
+        startFormationTimer()
+    else
+        Ext.Events.GameStateChanged:Subscribe(function(e)
+            if e.ToState == "Running" then
+                startFormationTimer()
+            end
+        end)
+    end
 end
 
 return Formations
