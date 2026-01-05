@@ -539,7 +539,28 @@ local NPCStatuses = {
     STATUS.DEFAULT_NPC
 }
 ---------------------------------------------------------------------------------------------
--- Check status helper
+-- Performance Optimization: Create hash sets for O(1) status lookups
+-- Instead of iterating through arrays (O(n)), we use hash tables for instant lookups
+local aiStatusSet = {}
+for _, status in ipairs(aiStatuses) do
+    aiStatusSet[status] = true
+end
+
+local aiCombatStatusSet = {}
+for _, status in ipairs(aiCombatStatuses) do
+    aiCombatStatusSet[status] = true
+end
+
+local NPCStatusSet = {}
+for _, status in ipairs(NPCStatuses) do
+    NPCStatusSet[status] = true
+end
+
+---------------------------------------------------------------------------------------------
+-- Check status helper functions
+--- Check if character has any AI combat status
+--- @param character string Character UUID
+--- @return boolean True if character has any AI combat status
 local function hasAnyAICombatStatus(character)
     for _, status in ipairs(aiCombatStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
@@ -549,6 +570,9 @@ local function hasAnyAICombatStatus(character)
     return false
 end
 
+--- Check if character has any NPC status
+--- @param character string Character UUID
+--- @return boolean True if character has any NPC status
 local function hasAnyNPCStatus(character)
     for _, status in ipairs(NPCStatuses) do
         if Osi.HasActiveStatus(character, status) == 1 then
@@ -558,15 +582,16 @@ local function hasAnyNPCStatus(character)
     return false
 end
 
+--- Check if a status is a controller status (O(1) lookup using hash set)
+--- @param status string The status name to check
+--- @return boolean True if status is a controller status
 local function isControllerStatus(status)
-    for _, brainStatus in ipairs(aiStatuses) do
-        if brainStatus == status then
-            return true
-        end
-    end
-    return false
+    return aiStatusSet[status] == true
 end
 
+--- Check if character has any controller status
+--- @param character string Character UUID
+--- @return boolean True if character has any controller status
 local function hasControllerStatus(character)
     for _, brainStatus in ipairs(aiStatuses) do
         if Osi.HasActiveStatus(character, brainStatus) == 1 then
@@ -576,13 +601,18 @@ local function hasControllerStatus(character)
     return false
 end
 
-local NPCStatusSet = {}
-for _, status in ipairs(NPCStatuses) do
-    NPCStatusSet[status] = true
+--- Check if a status is an NPC status (O(1) lookup using hash set)
+--- @param status string The status name to check
+--- @return boolean True if status is an NPC status
+local function IsNPCStatus(status)
+    return NPCStatusSet[status] == true
 end
 
-local function IsNPCStatus(status)
-    return NPCStatusSet[status] ~= nil
+--- Check if a status is a combat status (O(1) lookup using hash set)
+--- @param status string The status name to check
+--- @return boolean True if status is a combat status
+local function isCombatStatus(status)
+    return aiCombatStatusSet[status] == true
 end
 ---------------------------------------------------------------------------------------------
 -- No idea why I'm doing this
