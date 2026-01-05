@@ -57,11 +57,11 @@ function MCM.ManageAlliesMind()
 end
 
 function MCM.ManageAlliesDashing()
-    ManageMCMPassive("disableAlliesDashing", PASSIVE.ALLIES_DASHING, true)
+    ManageMCMPassive("disableAlliesDashing", PASSIVE.ALLIES_DASHING_DISABLED)
 end
 
 function MCM.ManageAlliesThrowing()
-    ManageMCMPassive("disableAlliesThrowing", PASSIVE.ALLIES_THROWING, true)
+    ManageMCMPassive("disableAlliesThrowing", PASSIVE.ALLIES_THROWING_DISABLED)
 end
 
 function MCM.ManageDynamicSpellblock()
@@ -143,6 +143,18 @@ function MCM.ManageDebugSpells()
     end
 end
 
+function MCM.ManageFormations()
+    ManageMCMPassive("enableFormations", PASSIVE.UNLOCK_FORMATIONS)
+end
+
+function MCM.ManageAutoHeal()
+    ManageMCMPassive("enableAutoHeal", PASSIVE.UNLOCK_AUTO_HEAL)
+end
+
+function MCM.ManageAggressionModes()
+    ManageMCMPassive("enableAggressionModes", PASSIVE.UNLOCK_AGGRESSION_MODES)
+end
+
 --- Initialize all MCM settings
 function MCM.InitializeAll()
     local players = Osi.DB_PartOfTheTeam:Get(nil)
@@ -168,6 +180,9 @@ function MCM.InitializeAll()
     MCM.ManageAlliesSwarm()
     MCM.ManageOrderSpellsPassive()
     MCM.ManageDebugSpells()
+    MCM.ManageFormations()
+    MCM.ManageAutoHeal()
+    MCM.ManageAggressionModes()
 end
 
 --- Register MCM event listeners
@@ -196,6 +211,12 @@ function MCM.RegisterListeners(moduleUUID)
                 MCM.ManageOrderSpellsPassive()
             elseif payload.settingId == "enableDebugSpells" then
                 MCM.ManageDebugSpells()
+            elseif payload.settingId == "enableFormations" then
+                MCM.ManageFormations()
+            elseif payload.settingId == "enableAutoHeal" then
+                MCM.ManageAutoHeal()
+            elseif payload.settingId == "enableAggressionModes" then
+                MCM.ManageAggressionModes()
             end
         end)
     end
