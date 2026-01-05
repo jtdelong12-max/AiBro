@@ -1,7 +1,7 @@
 new entry "Target_Allies"
 type "SpellData"
 data "SpellType" "Target"
-data "ContainerSpells" "Target_Allies_Melee;Target_Allies_Ranged;Target_Allies_Healer_Melee;Target_Allies_Healer_Ranged;Target_Allies_Mage_Melee;Target_Allies_Mage_Ranged;Target_Allies_General;X_Shout_AI_State;Target_Allies_Thrower;Target_Allies_Default;Target_Allies_Trickster;Target_Allies_Tank;Target_Allies_Scout;Target_Allies_Support;Target_Allies_Controller"
+data "ContainerSpells" "Target_Allies_Melee;Target_Allies_Ranged;Target_Allies_Berserker;Target_Allies_Healer_Melee;Target_Allies_Healer_Ranged;Target_Allies_Mage_Melee;Target_Allies_Mage_Ranged;Target_Allies_Tank;Target_Allies_Scout;Target_Allies_Support;Target_Allies_Controller;Target_Allies_Cancel"
 data "TargetRadius" "30"
 data "TargetConditions" "Character() and not Enemy() and (Party(context.Target) and Party(context.Source)) and not HasStatus('ALLIES_MINDCONTROL') or HasStatus('AI_ALLIES_POSSESSED') or HasStatus('ToggleIsNPC')"
 data "Icon" "Spell_Enchantment_Friends"

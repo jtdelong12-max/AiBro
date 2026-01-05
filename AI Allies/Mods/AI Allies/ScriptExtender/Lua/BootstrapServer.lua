@@ -18,6 +18,7 @@ end
 local Shared = Ext.Require("Shared.lua")
 local AI = Ext.Require("AI.lua")
 local Combat = Ext.Require("Combat.lua")
+local Eldertide = Ext.Require("Eldertide.lua")
 
 -- Import shared constants and utilities (single source of truth)
 local CONSTANTS = Shared.CONSTANTS
@@ -1190,3 +1191,8 @@ end)
 Ext.Osiris.RegisterListener("UsingSpellOnTarget", 6, "after", function(caster, target, spell, spellType, spellElement, storyActionID)
     HandleSwarmGroupAssignment(caster, target, spell)
 end)
+
+----------------------------------------------------------------------------------
+-- Eldertide Armaments Integration
+----------------------------------------------------------------------------------
+Eldertide.RegisterListeners()
