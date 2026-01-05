@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <contentList>
 	<content contentuid="b5f477dc-64cc-43f6-a026-7c49635aa113" version="1">AI Allies: Archetypes</content>
-	<content contentuid="f885e642-390b-4fa9-9cda-7118dcb91837" version="1">Choose how your characters will act.</content>
+	<content contentuid="f885e642-390b-4fa9-9cda-7118dcb91837" version="1">Choose an ally archetype to summon: Melee, Ranged, Berserker, Healer, Mage, Tank, Scout, Support, or Controller.</content>
 	<content contentuid="6e783857-b500-4a54-8ca6-2520a505dd85" version="1">Cast again to cancel</content>
 	<content contentuid="0547cdd6-dc38-4ec9-865f-4fe2c94aacfc" version="1">Fighter Melee Archetype</content>
 	<content contentuid="37de1530-204c-4528-b7af-9f0928c1983e" version="1">Fighter Ranged Archetype</content>
@@ -120,4 +120,12 @@
 	<content contentuid="3279c93e-46ec-4cf9-99d6-824a532f2a75" version="1">Clears the target's Swarm Group</content>
 	<content contentuid="d2dc3a3d-353e-40e2-8b49-0b72ba0d89aa" version="1">Use a bonus action to mark a target for your allies as a priority, your allies will then proceed to bully this target for 3 turns. Your allies will also get a roll bonus to attack of 1d4-1 against this target.</content>
 	<content contentuid="0ffcf642-4b47-4fe9-a7f3-ace28a991e47" version="1">Use a bonus action to mark a target for your allies as a low priority for 3 turns, your allies will try to do absolutely anything else but target this target unless there's nothing else to do. Targets are afflicted with a -1d4+1 penalty to attack rolls against your allies.</content>
+	<content contentuid="h_Target_Allies_Tank_Name" version="1">Summon Tank</content>
+	<content contentuid="h_Target_Allies_Tank_Desc" version="1">Summon a durable ally designed to hold the frontline and absorb damage.</content>
+	<content contentuid="h_Target_Allies_Scout_Name" version="1">Summon Scout</content>
+	<content contentuid="h_Target_Allies_Scout_Desc" version="1">Summon a highly mobile ally to uncover the map and strike high-value targets.</content>
+	<content contentuid="h_Target_Allies_Support_Name" version="1">Summon Support</content>
+	<content contentuid="h_Target_Allies_Support_Desc" version="1">Summon a utility caster to buff allies and control the battlefield.</content>
+	<content contentuid="h_Target_Allies_Controller_Name" version="1">Summon Controller</content>
+	<content contentuid="h_Target_Allies_Controller_Desc" version="1">Summon a spellcaster focused on crowd control and locking down enemies.</content>
 </contentList>
