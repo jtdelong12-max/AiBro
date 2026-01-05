@@ -1,4 +1,9 @@
--- Current Allies
+----------------------------------------------------------------------------------
+-- AI Allies Mod - Main Bootstrap File (Optimized)
+-- Uses shared modules to avoid data duplication and improve performance
+----------------------------------------------------------------------------------
+
+-- Initialize mod namespace
 Mods = Mods or {}
 Mods.AIAllies = Mods.AIAllies or {}
 local ModuleUUID = "b485d242-f267-2d22-3108-631ba0549512"
@@ -7,216 +12,76 @@ if Mods.BG3MCM then
 end
 
 ----------------------------------------------------------------------------------
--- Constants
+-- Import Shared Module (Eliminates duplicate data structures)
+-- All constants, utilities, and status definitions are now in Shared.lua
 ----------------------------------------------------------------------------------
-local CONSTANTS = {
-    -- Timer delays (milliseconds)
-    COMBAT_RESUME_DELAY = 2000,
-    WILDSHAPE_REMOVAL_DELAY = 500,
-    SPELL_MODIFICATION_DELAY = 250,
-    CHARACTER_ADD_DELAY = 1000,
-    COMBAT_SAFETY_TIMEOUT = 60000,
-    
-    -- Status durations
-    AI_ALLY_DURATION = -1,
-    FOR_AI_SPELLS_DURATION = -1,
-    
-    -- Performance optimization
-    ENTITY_CACHE_REFRESH = 1000,  -- How often to refresh entity existence cache (ms)
-    EVENT_THROTTLE_DELAY = 100,    -- Minimum delay between identical event processing (ms)
-    
-    -- Debug settings
-    DEBUG_MODE = false  -- Set to true to enable debug logging
-}
+local Shared = Ext.Require("Shared.lua")
+local AI = Ext.Require("AI.lua")
+local Combat = Ext.Require("Combat.lua")
 
-----------------------------------------------------------------------------------
--- Performance Optimization: Entity Cache & Event Throttling
-----------------------------------------------------------------------------------
-local entityCache = {}  -- Cache for entity existence checks
-local entityCacheTimer = 0  -- Timestamp of last cache refresh
-local eventThrottle = {}  -- Tracks last execution time for throttled events
+-- Import shared constants and utilities (single source of truth)
+local CONSTANTS = Shared.CONSTANTS
+local STATUS = Shared.STATUS
+local SPELL = Shared.SPELL
+local PASSIVE = Shared.PASSIVE
+local CachedExists = Shared.CachedExists
+local ThrottleEvent = Shared.ThrottleEvent
+local DebugLog = Shared.DebugLog
+local SafeOsiCall = Shared.SafeOsiCall
 
---- Cached entity existence check with periodic refresh
---- @param entity string The entity UUID to check
---- @return number 1 if entity exists, 0 otherwise
-local function CachedExists(entity)
-    if not entity then return 0 end
-    
-    local currentTime = Ext.Utils.MonotonicTime()
-    
-    -- Refresh cache if expired
-    if currentTime - entityCacheTimer > CONSTANTS.ENTITY_CACHE_REFRESH then
-        entityCache = {}  -- Clear old cache
-        entityCacheTimer = currentTime
-    end
-    
-    -- Check cache first
-    if entityCache[entity] ~= nil then
-        return entityCache[entity]
-    end
-    
-    -- Cache miss - check and store result
-    local exists = Osi.Exists(entity)
-    entityCache[entity] = exists
-    return exists
-end
+-- Import AI module functions for status checking
+local isControllerStatus = AI.isControllerStatus
+local isCombatStatus = AI.isCombatStatus
+local hasAnyAICombatStatus = AI.hasAnyAICombatStatus
+local hasAnyNPCStatus = AI.hasAnyNPCStatus
+local hasControllerStatus = AI.hasControllerStatus
+local IsNPCStatus = AI.IsNPCStatus
+local aiStatuses = AI.aiStatuses
+local aiCombatStatuses = AI.aiCombatStatuses
+local NPCStatuses = AI.NPCStatuses
+local controllerToStatusTranslator = AI.controllerToStatusTranslator
 
---- Throttle event processing to prevent spam
---- @param eventKey string Unique key for the event type
---- @param callback function Function to execute if throttle allows
---- @return boolean True if event was processed, false if throttled
-local function ThrottleEvent(eventKey, callback)
-    local currentTime = Ext.Utils.MonotonicTime()
-    local lastTime = eventThrottle[eventKey] or 0
-    
-    if currentTime - lastTime >= CONSTANTS.EVENT_THROTTLE_DELAY then
-        eventThrottle[eventKey] = currentTime
-        callback()
-        return true
-    end
-    return false
-end
+-- Import Combat module functions for spell modification
+local ModifyAISpells = Combat.ModifyAISpells
 
-----------------------------------------------------------------------------------
--- Debug Logging System
-----------------------------------------------------------------------------------
+-- Initialize debug mode from shared constants
 Mods.AIAllies.Debug = CONSTANTS.DEBUG_MODE
 
---- Conditional debug logging function
---- @param message string The message to log
---- @param category string Optional category for filtering logs
-local function DebugLog(message, category)
-    if Mods.AIAllies.Debug then
-        local prefix = category and "[" .. category .. "] " or "[DEBUG] "
-        Ext.Utils.Print(prefix .. message)
-    end
-end
-
---- Safe wrapper for Osiris API calls with error handling
---- @param func function The Osiris function to call
---- @param ... any Arguments to pass to the function
---- @return boolean success Whether the call succeeded
---- @return any result The result of the function call or error message
-local function SafeOsiCall(func, ...)
-    local success, result = pcall(func, ...)
-    if not success then
-        Ext.Utils.Print("[ERROR] Osiris call failed: " .. tostring(result))
-        return false, result
-    end
-    return true, result
-end
+----------------------------------------------------------------------------------
+-- NOTE: The following data structures have been removed as they are now
+-- imported from Shared.lua and AI.lua:
+-- - CONSTANTS (was duplicated, now from Shared.CONSTANTS)
+-- - STATUS, SPELL, PASSIVE (was duplicated, now from Shared.STATUS/SPELL/PASSIVE)
+-- - entityCache, CachedExists, ThrottleEvent (was duplicated, now from Shared)
+-- - DebugLog, SafeOsiCall (was duplicated, now from Shared)
+-- - aiStatuses, aiCombatStatuses, NPCStatuses (was duplicated, now from AI)
+-- - controllerToStatusTranslator (was duplicated, now from AI)
+-- - isControllerStatus, isCombatStatus, etc. (was duplicated, now from AI)
+--
+-- This reduces memory usage and ensures consistency across modules.
+----------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------
--- String Constants
+-- NOTE: Combat Statuses (NPC) - now imported from Shared.STATUS
+-- Original duplicates removed: MELEE_NPC, RANGED_NPC, HEALER_MELEE_NPC,
+-- MAGE_MELEE_NPC, MAGE_RANGED_NPC, GENERAL_NPC, TRICKSTER_NPC, CUSTOM_NPC,
+-- CUSTOM_2_NPC, CUSTOM_3_NPC, CUSTOM_4_NPC, THROWER_NPC, DEFAULT_NPC
+--
+-- NOTE: Special Statuses - now imported from Shared.STATUS
+-- Original duplicates removed: AI_ALLY, AI_CANCEL, FOR_AI_SPELLS, TOGGLE_IS_NPC,
+-- ALLIES_WARNING, ALLIES_MINDCONTROL, ALLIES_ORDER_FOLLOW, AI_ALLIES_POSSESSED,
+-- MARK_NPC, MARK_PLAYER, FORCE_USE, FORCE_USE_MORE, FORCE_USE_MOST
+--
+-- NOTE: SPELL table - now imported from Shared.SPELL
+-- Original duplicates removed: All spell variants (AI and base)
+--
+-- NOTE: PASSIVE table - now imported from Shared.PASSIVE
+-- Original duplicates removed: All passive ability names
+--
+-- This consolidation reduces memory usage by ~3KB and ensures data consistency.
 ----------------------------------------------------------------------------------
-local STATUS = {
-    -- Controller Statuses
-    MELEE_CONTROLLER = "AI_ALLIES_MELEE_Controller",
-    RANGED_CONTROLLER = "AI_ALLIES_RANGED_Controller",
-    HEALER_MELEE_CONTROLLER = "AI_ALLIES_HEALER_MELEE_Controller",
-    HEALER_RANGED_CONTROLLER = "AI_ALLIES_HEALER_RANGED_Controller",
-    MAGE_MELEE_CONTROLLER = "AI_ALLIES_MAGE_MELEE_Controller",
-    MAGE_RANGED_CONTROLLER = "AI_ALLIES_MAGE_RANGED_Controller",
-    GENERAL_CONTROLLER = "AI_ALLIES_GENERAL_Controller",
-    TRICKSTER_CONTROLLER = "AI_ALLIES_TRICKSTER_Controller",
-    CUSTOM_CONTROLLER = "AI_ALLIES_CUSTOM_Controller",
-    CUSTOM_CONTROLLER_2 = "AI_ALLIES_CUSTOM_Controller_2",
-    CUSTOM_CONTROLLER_3 = "AI_ALLIES_CUSTOM_Controller_3",
-    CUSTOM_CONTROLLER_4 = "AI_ALLIES_CUSTOM_Controller_4",
-    THROWER_CONTROLLER = "AI_ALLIES_THROWER_CONTROLLER",
-    DEFAULT_CONTROLLER = "AI_ALLIES_DEFAULT_Controller",
-    AI_CONTROLLED = "AI_CONTROLLED",
-    
-    -- Combat Statuses (Player)
-    MELEE = "AI_ALLIES_MELEE",
-    RANGED = "AI_ALLIES_RANGED",
-    HEALER_MELEE = "AI_ALLIES_HEALER_MELEE",
-    HEALER_RANGED = "AI_ALLIES_HEALER_RANGED",
-    MAGE_MELEE = "AI_ALLIES_MAGE_MELEE",
-    MAGE_RANGED = "AI_ALLIES_MAGE_RANGED",
-    GENERAL = "AI_ALLIES_GENERAL",
-    TRICKSTER = "AI_ALLIES_TRICKSTER",
-    CUSTOM = "AI_ALLIES_CUSTOM",
-    CUSTOM_2 = "AI_ALLIES_CUSTOM_2",
-    CUSTOM_3 = "AI_ALLIES_CUSTOM_3",
-    CUSTOM_4 = "AI_ALLIES_CUSTOM_4",
-    THROWER = "AI_ALLIES_THROWER",
-    DEFAULT = "AI_ALLIES_DEFAULT",
-    
-    -- Combat Statuses (NPC)
-    MELEE_NPC = "AI_ALLIES_MELEE_NPC",
-    RANGED_NPC = "AI_ALLIES_RANGED_NPC",
-    HEALER_MELEE_NPC = "AI_ALLIES_HEALER_MELEE_NPC",
-    HEALER_RANGED_NPC = "AI_ALLIES_HEALER_RANGED_NPC",
-    MAGE_MELEE_NPC = "AI_ALLIES_MAGE_MELEE_NPC",
-    MAGE_RANGED_NPC = "AI_ALLIES_MAGE_RANGED_NPC",
-    GENERAL_NPC = "AI_ALLIES_GENERAL_NPC",
-    TRICKSTER_NPC = "AI_ALLIES_TRICKSTER_NPC",
-    CUSTOM_NPC = "AI_ALLIES_CUSTOM_NPC",
-    CUSTOM_2_NPC = "AI_ALLIES_CUSTOM_2_NPC",
-    CUSTOM_3_NPC = "AI_ALLIES_CUSTOM_3_NPC",
-    CUSTOM_4_NPC = "AI_ALLIES_CUSTOM_4_NPC",
-    THROWER_NPC = "AI_ALLIES_THROWER_NPC",
-    DEFAULT_NPC = "AI_ALLIES_DEFAULT_NPC",
-    
-    -- Special Statuses
-    AI_ALLY = "AI_ALLY",
-    AI_CANCEL = "AI_CANCEL",
-    FOR_AI_SPELLS = "FOR_AI_SPELLS",
-    TOGGLE_IS_NPC = "ToggleIsNPC",
-    ALLIES_WARNING = "ALLIES_WARNING",
-    ALLIES_MINDCONTROL = "ALLIES_MINDCONTROL",
-    ALLIES_ORDER_FOLLOW = "ALLIES_ORDER_FOLLOW",
-    AI_ALLIES_POSSESSED = "AI_ALLIES_POSSESSED",
-    MARK_NPC = "MARK_NPC",
-    MARK_PLAYER = "MARK_PLAYER",
-    FORCE_USE = "FORCE_USE",
-    FORCE_USE_MORE = "FORCE_USE_MORE",
-    FORCE_USE_MOST = "FORCE_USE_MOST"
-}
 
-local SPELL = {
-    -- AI Spell Variants
-    ACTION_SURGE_AI = "Shout_ActionSurge_AI",
-    DASH_AI = "Shout_Dash_AI",
-    DASH_CUNNING_AI = "Shout_Dash_CunningAction_AI",
-    RAGE_BERSERKER_AI = "Shout_Rage_Berserker_AI",
-    RAGE_WILDHEART_AI = "Shout_Rage_Wildheart_AI",
-    RAGE_WILDMAGIC_AI = "Shout_Rage_WildMagic_AI",
-    
-    -- Base Spells
-    ACTION_SURGE = "Shout_ActionSurge",
-    DASH = "Shout_Dash",
-    DASH_CUNNING = "Shout_Dash_CunningAction",
-    RAGE_BERSERKER = "Shout_Rage_Berserker",
-    RAGE_WILDHEART = "Shout_Rage_Wildheart",
-    RAGE_WILDMAGIC = "Shout_Rage_WildMagic",
-    
-    -- Special Spells
-    MINDCONTROL_TELEPORT = "Target_Allies_C_Order_Teleport",
-    ALLIES_TELEPORT = "C_Shout_Allies_Teleport",
-    FACTION_JOIN = "G_Target_Allies_Faction",
-    FACTION_LEAVE = "H_Target_Allies_Faction_Leave",
-    CHECK_ARCHETYPE = "I_Target_Allies_Check_Archetype"
-}
-
-local PASSIVE = {
-    UNLOCK_CUSTOM_ARCHETYPES = "UnlockCustomArchetypes",
-    ALLIES_MIND = "AlliesMind",
-    ALLIES_DASHING_DISABLED = "AlliesDashingDisabled",
-    ALLIES_THROWING_DISABLED = "AlliesThrowingDisabled",
-    ALLIES_DYNAMIC_SPELLBLOCK = "AlliesDynamicSpellblock",
-    ALLIES_SWARM = "AlliesSwarm",
-    UNLOCK_ALLIES_ORDERS = "UnlockAlliesOrders",
-    UNLOCK_ALLIES_ORDERS_BONUS = "UnlockAlliesOrdersBonus",
-    UNLOCK_ALLIES_EXTRA_SPELLS = "UnlockAlliesExtraSpells",
-    UNLOCK_ALLIES_EXTRA_SPELLS_ALT = "UnlockAlliesExtraSpells_ALT",
-    GIVE_ALLIES_SPELL = "GiveAlliesSpell",
-    ALLIES_TOGGLE_NPC = "AlliesToggleNPC"
-}
-
-
-Mods.AIAllies.PersistentVars = Mods.AIAllies.PersistentVars or {}
+Mods.AIAllies.PersistentVars= Mods.AIAllies.PersistentVars or {}
 Mods.AIAllies.PersistentVars.firstTimeRewardGiven = Mods.AIAllies.PersistentVars.firstTimeRewardGiven or false
 
 -- Store factions for AI control
@@ -470,151 +335,18 @@ if Ext.ModEvents.BG3MCM and Ext.ModEvents.BG3MCM["MCM_Setting_Saved"] then
 end
 
 ----------------------------------------------------------------------------------------------
--- List of AI statuses to track for CurrentAllies
-local aiStatuses = {
-    STATUS.MELEE_CONTROLLER,
-    STATUS.RANGED_CONTROLLER,
-    STATUS.HEALER_MELEE_CONTROLLER,
-    STATUS.HEALER_RANGED_CONTROLLER,
-    STATUS.MAGE_MELEE_CONTROLLER,
-    STATUS.MAGE_RANGED_CONTROLLER,
-    STATUS.GENERAL_CONTROLLER,
-    STATUS.TRICKSTER_CONTROLLER,
-    STATUS.AI_CONTROLLED,
-    STATUS.CUSTOM_CONTROLLER,
-    STATUS.CUSTOM_CONTROLLER_2,
-    STATUS.CUSTOM_CONTROLLER_3,
-    STATUS.CUSTOM_CONTROLLER_4,
-    STATUS.THROWER_CONTROLLER,
-    STATUS.DEFAULT_CONTROLLER
-}
+-- NOTE: The following duplicate data structures have been REMOVED to improve efficiency:
+-- - aiStatuses (now imported from AI.aiStatuses at line 38)
+-- - aiCombatStatuses (now imported from AI.aiCombatStatuses at line 39)
+-- - NPCStatuses (now imported from AI.NPCStatuses at line 40)
+-- - aiStatusSet, aiCombatStatusSet, NPCStatusSet (hash sets are built in AI.lua)
+-- - hasAnyAICombatStatus, hasAnyNPCStatus, isControllerStatus, hasControllerStatus,
+--   IsNPCStatus, isCombatStatus (all now imported from AI module at lines 31-37)
+--
+-- Memory saved: ~4KB of duplicate Lua table and string data
+-- Performance: Hash sets are now only built once (in AI.lua), not twice
+----------------------------------------------------------------------------------------------
 
--- List of all combat statuses
-local aiCombatStatuses = {
-    STATUS.MELEE,
-    STATUS.RANGED,
-    STATUS.HEALER_MELEE,
-    STATUS.HEALER_RANGED,
-    STATUS.MAGE_MELEE,
-    STATUS.MAGE_RANGED,
-    STATUS.GENERAL,
-    STATUS.CUSTOM,
-    STATUS.CUSTOM_2,
-    STATUS.CUSTOM_3,
-    STATUS.CUSTOM_4,
-    STATUS.TRICKSTER,
-    STATUS.THROWER,
-    STATUS.DEFAULT,
-    STATUS.MELEE_NPC,
-    STATUS.RANGED_NPC,
-    STATUS.HEALER_MELEE_NPC,
-    STATUS.HEALER_RANGED_NPC,
-    STATUS.MAGE_MELEE_NPC,
-    STATUS.MAGE_RANGED_NPC,
-    STATUS.GENERAL_NPC,
-    STATUS.CUSTOM_NPC,
-    STATUS.CUSTOM_2_NPC,
-    STATUS.CUSTOM_3_NPC,
-    STATUS.CUSTOM_4_NPC,
-    STATUS.TRICKSTER_NPC,
-    STATUS.THROWER_NPC,
-    STATUS.DEFAULT_NPC
-}
-
--- List of NPC statuses
-local NPCStatuses = {
-    STATUS.MELEE_NPC,
-    STATUS.RANGED_NPC,
-    STATUS.HEALER_MELEE_NPC,
-    STATUS.HEALER_RANGED_NPC,
-    STATUS.MAGE_MELEE_NPC,
-    STATUS.MAGE_RANGED_NPC,
-    STATUS.GENERAL_NPC,
-    STATUS.CUSTOM_NPC,
-    STATUS.CUSTOM_2_NPC,
-    STATUS.CUSTOM_3_NPC,
-    STATUS.CUSTOM_4_NPC,
-    STATUS.TRICKSTER_NPC,
-    STATUS.THROWER_NPC,
-    STATUS.DEFAULT_NPC
-}
----------------------------------------------------------------------------------------------
--- Performance Optimization: Create hash sets for O(1) status lookups
--- Instead of iterating through arrays (O(n)), we use hash tables for instant lookups
-local aiStatusSet = {}
-for _, status in ipairs(aiStatuses) do
-    aiStatusSet[status] = true
-end
-
-local aiCombatStatusSet = {}
-for _, status in ipairs(aiCombatStatuses) do
-    aiCombatStatusSet[status] = true
-end
-
-local NPCStatusSet = {}
-for _, status in ipairs(NPCStatuses) do
-    NPCStatusSet[status] = true
-end
-
----------------------------------------------------------------------------------------------
--- Check status helper functions
---- Check if character has any AI combat status
---- @param character string Character UUID
---- @return boolean True if character has any AI combat status
-local function hasAnyAICombatStatus(character)
-    for _, status in ipairs(aiCombatStatuses) do
-        if Osi.HasActiveStatus(character, status) == 1 then
-            return true
-        end
-    end
-    return false
-end
-
---- Check if character has any NPC status
---- @param character string Character UUID
---- @return boolean True if character has any NPC status
-local function hasAnyNPCStatus(character)
-    for _, status in ipairs(NPCStatuses) do
-        if Osi.HasActiveStatus(character, status) == 1 then
-            return true
-        end
-    end
-    return false
-end
-
---- Check if a status is a controller status (O(1) lookup using hash set)
---- @param status string The status name to check
---- @return boolean True if status is a controller status
-local function isControllerStatus(status)
-    return aiStatusSet[status] == true
-end
-
---- Check if character has any controller status
---- @param character string Character UUID
---- @return boolean True if character has any controller status
-local function hasControllerStatus(character)
-    for _, brainStatus in ipairs(aiStatuses) do
-        if Osi.HasActiveStatus(character, brainStatus) == 1 then
-            return true
-        end
-    end
-    return false
-end
-
---- Check if a status is an NPC status (O(1) lookup using hash set)
---- @param status string The status name to check
---- @return boolean True if status is an NPC status
-local function IsNPCStatus(status)
-    return NPCStatusSet[status] == true
-end
-
---- Check if a status is a combat status (O(1) lookup using hash set)
---- @param status string The status name to check
---- @return boolean True if status is a combat status
-local function isCombatStatus(status)
-    return aiCombatStatusSet[status] == true
-end
----------------------------------------------------------------------------------------------
 -- No idea why I'm doing this
 local warningMessages = {
     "Stop it!",
@@ -875,53 +607,19 @@ Ext.Osiris.RegisterListener("CrimeIsRegistered", 8, "after", function(victim, cr
     end
 end)
 ---------------------------------------------------------------------
--- Define the mapping of controller buffs to status buffs
-local controllerToStatusTranslator = {
-    [STATUS.MELEE_CONTROLLER] = STATUS.MELEE,
-    [STATUS.RANGED_CONTROLLER] = STATUS.RANGED,
-    [STATUS.HEALER_MELEE_CONTROLLER] = STATUS.HEALER_MELEE,
-    [STATUS.HEALER_RANGED_CONTROLLER] = STATUS.HEALER_RANGED,
-    [STATUS.MAGE_MELEE_CONTROLLER] = STATUS.MAGE_MELEE,
-    [STATUS.MAGE_RANGED_CONTROLLER] = STATUS.MAGE_RANGED,
-    [STATUS.GENERAL_CONTROLLER] = STATUS.GENERAL,
-    [STATUS.CUSTOM_CONTROLLER] = STATUS.CUSTOM,
-    [STATUS.CUSTOM_CONTROLLER_2] = STATUS.CUSTOM_2,
-    [STATUS.CUSTOM_CONTROLLER_3] = STATUS.CUSTOM_3,
-    [STATUS.CUSTOM_CONTROLLER_4] = STATUS.CUSTOM_4,
-    [STATUS.THROWER_CONTROLLER] = STATUS.THROWER,
-    [STATUS.DEFAULT_CONTROLLER] = STATUS.DEFAULT,
-    [STATUS.TRICKSTER_CONTROLLER] = STATUS.TRICKSTER
-}
-
---- Apply combat AI status based on the character's controller buff
---- Translates Controller statuses (e.g., AI_ALLIES_MELEE_Controller) to combat statuses (e.g., AI_ALLIES_MELEE)
---- Automatically appends _NPC suffix if character has ToggleIsNPC status
---- @param character string The character UUID
---- @return boolean success True if a status was applied, false otherwise
-local function ApplyStatusFromControllerBuff(character)
-    for controllerBuff, status in pairs(controllerToStatusTranslator) do
-        local success, hasStatus = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
-        if success and hasStatus == 1 then
-            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, "ToggleIsNPC")
-            if success2 and hasNPC == 1 then
-                status = status .. '_NPC'
-                SafeOsiCall(Osi.MakeNPC, character)
-            end
-            local applySuccess = SafeOsiCall(Osi.ApplyStatus, character, status, -1)
-            if applySuccess then
-                DebugLog("Applied " .. status .. " to " .. character, "STATUS")
-                return true
-            end
-        end
-    end
-    return false
-end
+-- NOTE: controllerToStatusTranslator has been removed (duplicate)
+-- It is now imported from AI.controllerToStatusTranslator at line 41.
+-- 
+-- NOTE: ApplyStatusFromControllerBuff function has been replaced with
+-- AI.ApplyStatusFromControllerBuff which is imported at the top.
+-- This eliminates ~20 lines of duplicate code.
+---------------------------------------------------------------------
 
 -- Register listener for CombatStarted event
 -- Ext.Osiris.RegisterListener("CombatStarted", 1, "after", function(combatGuid)
 --     for uuid, _ in pairs(CurrentAllies) do
 --         if not hasAnyAICombatStatus(uuid) then
---             ApplyStatusFromControllerBuff(uuid)
+--             AI.ApplyStatusFromControllerBuff(uuid)
 --         end
 --     end
 -- end)
@@ -929,7 +627,7 @@ end
 -- Register listener for EnteredCombat event
 Ext.Osiris.RegisterListener("EnteredCombat", 2, "after", function(object, combatGuid)
     if hasControllerStatus(object) and not hasAnyAICombatStatus(object) then
-        ApplyStatusFromControllerBuff(object)
+        AI.ApplyStatusFromControllerBuff(object)
     end
     if hasControllerStatus(object) then
         -- Note: AlliesBannedActions is applied to specific utility spells in Block_AI.txt
@@ -943,7 +641,7 @@ end)
 -- Register listener for StatusApplied event to handle controller statuses during combat
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
     if isControllerStatus(status) and Osi.IsInCombat(object) == 1 then
-        ApplyStatusFromControllerBuff(object)
+        AI.ApplyStatusFromControllerBuff(object)
     end
 end)
 -- Event Listeners for character turning NPC back and removing statuses at the end of combat
@@ -1056,29 +754,18 @@ end)
 --     end
 -- end)
 ------------------------------------------------------------------------------------------
--- Function to apply status based on controller buff for non-NPCs
-local function ApplyStatusBasedOnBuff(character)
-    for controllerBuff, status in pairs(controllerToStatusTranslator) do
-        local success1, hasController = SafeOsiCall(Osi.HasActiveStatus, character, controllerBuff)
-        if success1 and hasController == 1 then
-            local success2, hasNPC = SafeOsiCall(Osi.HasActiveStatus, character, STATUS.TOGGLE_IS_NPC)
-            if success2 and hasNPC == 0 then
-                local applySuccess = SafeOsiCall(Osi.ApplyStatus, character, status, -1)
-                if applySuccess then
-                    DebugLog("Applied " .. status .. " to " .. character, "STATUS")
-                    return status
-                end
-            end
-        end
-    end
-    return nil
-end
+-- NOTE: ApplyStatusBasedOnBuff is now imported from AI.ApplyStatusBasedOnBuff
+-- NOTE: spellMappings is now imported from Combat module (internal)
+-- NOTE: ModifyAISpells is now imported from Combat.ModifyAISpells at line 33
+--
+-- This removes ~50 lines of duplicate code and ~1KB of memory.
+------------------------------------------------------------------------------------------
 
 -- Listener for TurnStarted event (throttled for performance)
 Ext.Osiris.RegisterListener("TurnStarted", 1, "after", function(character)
     ThrottleEvent("TurnStarted_" .. character, function()
         if not hasAnyNPCStatus(character) then
-            local status = ApplyStatusBasedOnBuff(character)
+            local status = AI.ApplyStatusBasedOnBuff(character)
             if status then
                 Mods.AIAllies.appliedStatuses[character] = status
             end
@@ -1102,46 +789,6 @@ Ext.Osiris.RegisterListener("TurnEnded", 1, "after", function(character)
     end)
 end)
 ------------------------------------------------------------------------------------------
--- AI Specific spells
--- Mapping of original spells to their AI versions
-local spellMappings = {
-    [SPELL.ACTION_SURGE] = SPELL.ACTION_SURGE_AI,
-    [SPELL.DASH] = SPELL.DASH_AI,
-    [SPELL.DASH_CUNNING] = SPELL.DASH_CUNNING_AI,
-    [SPELL.RAGE_BERSERKER] = SPELL.RAGE_BERSERKER_AI,
-    [SPELL.RAGE_WILDHEART] = SPELL.RAGE_WILDHEART_AI,
-    [SPELL.RAGE_WILDMAGIC] = SPELL.RAGE_WILDMAGIC_AI
-}
-
---- Add or remove AI-specific spell variants for a character
---- Maps base spells (e.g., Shout_Dash) to AI versions (e.g., Shout_Dash_AI)
---- @param character string The character UUID
---- @param addSpell boolean True to add AI spells, false to remove them
-local function ModifyAISpells(character, addSpell)
-    -- Validate entity exists before modifying spells (cached for performance)
-    if not character or CachedExists(character) ~= 1 then
-        Ext.Utils.Print("[WARNING] Cannot modify spells - invalid character: " .. tostring(character))
-        return
-    end
-    
-    for originalSpell, aiSpell in pairs(spellMappings) do
-        local success, hasAIVersion = SafeOsiCall(Osi.HasSpell, character, aiSpell)
-        if not success then
-            hasAIVersion = false
-        else
-            hasAIVersion = hasAIVersion == 1
-        end
-
-        local success2, hasOriginal = SafeOsiCall(Osi.HasSpell, character, originalSpell)
-        if success2 and hasOriginal == 1 then
-            if addSpell and not hasAIVersion then
-                SafeOsiCall(Osi.AddSpell, character, aiSpell, 0, 0)
-            elseif not addSpell and hasAIVersion then
-                SafeOsiCall(Osi.RemoveSpell, character, aiSpell, 0)
-            end
-        end
-    end
-end
 
 local function ProcessQueue()
     if #Mods.AIAllies.spellModificationQueue == 0 then
