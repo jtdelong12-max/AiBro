@@ -1,0 +1,974 @@
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:539
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Loading of file [C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_04/meta.lsx] has failed!
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::FileFormatIO::LoadFile
+Location: CoreLib\src\FileFormatIO.cpp (53)
+Message: Error while loading module "C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_04/meta.lsx"
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::Module::Load
+Location: GameEngine\Module.cpp (193)
+Message: Loading of file [C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_05/meta.lsx] has failed!
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::FileFormatIO::LoadFile
+Location: CoreLib\src\FileFormatIO.cpp (53)
+Message: Error while loading module "C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_05/meta.lsx"
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::Module::Load
+Location: GameEngine\Module.cpp (193)
+Message: Loading of file [C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_07/meta.lsx] has failed!
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::FileFormatIO::LoadFile
+Location: CoreLib\src\FileFormatIO.cpp (53)
+Message: Error while loading module "C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Mods/DiceSet_07/meta.lsx"
+Category: Code
+Timestamp: 08-01-2026 00:47:16:541
+Function: ls::Module::Load
+Location: GameEngine\Module.cpp (193)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:555
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Converting from FixedString to Guid: UUID
+Category: Code
+Timestamp: 08-01-2026 00:47:16:556
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (119)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'Dependencies' -> 'ModuleShortDesc'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:556
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:556
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:560
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:561
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:563
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:567
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:575
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:575
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:582
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:582
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:585
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Invalid XML element found!
+Category: Code
+Timestamp: 08-01-2026 00:47:16:586
+Function: ls::XMLSerializer::LoadNodeXML
+Location: CoreLib\src\XMLSerializer.cpp (277)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:586
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:587
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Converting from FixedString to Guid: UUID
+Category: Code
+Timestamp: 08-01-2026 00:47:16:592
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (119)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'Dependencies' -> 'ModuleShortDesc'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:592
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:593
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:604
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:608
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:609
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:629
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:630
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:631
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:631
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:631
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:631
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:631
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:636
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:637
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:638
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:638
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:639
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:640
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo' -> 'PublishVersion'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:640
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:644
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Name" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'Dependencies' -> 'ModuleShortDesc'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:650
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: Input type does not match requested type for attribute name "Version" expecting int32 (4) got int64 (32) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:16:651
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (155)
+Message: Input type does not match requested type for attribute name "MD5" expecting LSString (23) got FixedString (22) with node hierarchy: 'root' -> 'ModuleInfo'
+Category: Code
+Timestamp: 08-01-2026 00:47:31:115
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (248)
+Message: 'C:\Users\Tyler\AI Allies Project\AI Allies.pak' import complete successfully.
+
+Message: 'Mods/AI Allies/ScriptExtender/Lua/Shared.lua' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Ally_Spells.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/PassiveComp.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Statuses.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Passive_AI_Tactics.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Statuses - Controller.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Block_AI.txt' skipped
+
+Message: 'Public/AI Allies/Stats/Generated/Data/Spells_For_AI.txt' skipped
+
+Message: Trying to process a CommunityUGC request but interface is missing
+Category: Code
+Timestamp: 08-01-2026 00:47:35:476
+Function: net::CommunityUGCManagerImpl::ProcessRequest
+Location: GameNet\CommunityUGCManagerImpl.cpp (287)
+Message: Metadata not found for texture! Assets/LoadingScreen/~loadScreen_BG.png
+Category: UI
+Timestamp: 08-01-2026 00:47:35:529
+Function: ui::TextureProvider::GetMetadataAndRootPath
+Location: NoesisGUIBinding\UI\TextureProvider.cpp (268)
+Message: metadata Missing for Assets/LoadingScreen/~loadScreen_BG.png, please regenerate the metadata
+Category: Code
+Timestamp: 08-01-2026 00:47:35:529
+Function: ui::LoadedTextureResource::LoadedTextureResource
+Location: NoesisGUIBinding\UI\TextureProviderResources.cpp (221)
+Message: [NOESIS ERROR] [D:\Jenkins\workspace\Repo\FW4\Main\3rdParty\src\Noesis\3.1.6\Src\Packages\Gui\Core\Src\BitmapImage.cpp:228] "Widgets/LoadingScreen.xaml(199): Image not found '/Core;component/Assets/LoadingScreen/~loadScreen_BG.png'"
+Category: UI
+Timestamp: 08-01-2026 00:47:35:532
+Function: NoesisErrorHandler
+Location: D:\Jenkins\workspace\Repo\FW4\Main\3rdParty\src\Noesis\3.1.6\Src\Packages\Gui\Core\Src\BitmapImage.cpp (228)
+Message: Trying to fetch 'ActionResourceDefinition' object with id '00000000-0000-0000-0000-000000000000' from data container 'ActionResourceDefinitions' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:39:820
+Function: ls::ModdableFilesLoader<class ls::Guid,struct eoc::ActionResourceType>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:40:135
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:40:135
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:40:135
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Trying to hash a not loaded mod! 77a2155f-4b35-4f0c-e7ff-4338f91426a4
+Category: Code
+Timestamp: 08-01-2026 00:47:41:109
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_04 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Trying to hash a not loaded mod! 6efc8f44-cc2a-0273-d4b1-681d3faa411b
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_05 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Trying to hash a not loaded mod! bf19bab4-4908-ef39-9065-ced469c0f877
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_07 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:41:110
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Granite warning: W1006: A resolve request was dropped because there are too many outstanding resolve requests (32).
+Category: Code
+Timestamp: 08-01-2026 00:47:44:437
+Function: `anonymous-namespace'::GraniteLogger::LogWarning
+Location: GraniteBinding\src\GraniteManager.cpp (76)
+Message: No template found with id 22c96afa-e36e-4dc7-a96c-cb235ab5563d
+Category: Design
+Timestamp: 08-01-2026 00:47:46:287
+Function: ls::GlobalTemplateBank::GetTemplateForEditing
+Location: GameEngine\GlobalTemplateBank.cpp (157)
+Message: Root template 'TimelineTemplate_e26ac901-d1c1-44ca-bbee-2859976c88e2' (e26ac901-d1c1-44ca-bbee-2859976c88e2) could not find parent root with id: 22c96afa-e36e-4dc7-a96c-cb235ab5563d
+THIS IS VERY IMPORTANT! Data could get lost! 
+
+The roottemplate probably got deleted without removing all the referenced child templates! 
+Category: Design
+Timestamp: 08-01-2026 00:47:46:287
+Function: ls::GameObjectTemplate::ResolveParentTemplateData
+Location: GameEngine\GameObjectTemplate.cpp (740)
+Message: Unknown boost type 'AI_IGNORE:Tag'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:167
+Function: eoc::FixedStringToBoostType
+Location: EoCShared\Shared\BoostTypes.cpp (254)
+Message: Failed to parse boost 'AI_IGNORE:Tag(EXTRA_ATTACK_BLOCKED)'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:167
+Function: eoc::BoostPrototypeManager::CreateBoostPrototype
+Location: EoCShared\Shared\BoostPrototypeManager.cpp (59)
+Message: Unknown boost type 'AI_IGNORE:Tag'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:168
+Function: eoc::FixedStringToBoostType
+Location: EoCShared\Shared\BoostTypes.cpp (254)
+Message: Failed to parse boost 'AI_IGNORE:Tag(EXTRA_ATTACK_BLOCKED)'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:168
+Function: eoc::BoostPrototypeManager::CreateBoostPrototype
+Location: EoCShared\Shared\BoostPrototypeManager.cpp (59)
+Message: Unknown boost type 'AI_IGNORE:Tag'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:169
+Function: eoc::FixedStringToBoostType
+Location: EoCShared\Shared\BoostTypes.cpp (254)
+Message: Failed to parse boost 'AI_IGNORE:Tag(EXTRA_ATTACK_BLOCKED)'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:169
+Function: eoc::BoostPrototypeManager::CreateBoostPrototype
+Location: EoCShared\Shared\BoostPrototypeManager.cpp (59)
+Message: Unknown boost type 'AI_IGNORE:Tag'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:169
+Function: eoc::FixedStringToBoostType
+Location: EoCShared\Shared\BoostTypes.cpp (254)
+Message: Failed to parse boost 'AI_IGNORE:Tag(EXTRA_ATTACK_BLOCKED)'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:169
+Function: eoc::BoostPrototypeManager::CreateBoostPrototype
+Location: EoCShared\Shared\BoostPrototypeManager.cpp (59)
+Message: Unknown boost type 'AI_IGNORE:Tag'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:170
+Function: eoc::FixedStringToBoostType
+Location: EoCShared\Shared\BoostTypes.cpp (254)
+Message: Failed to parse boost 'AI_IGNORE:Tag(EXTRA_ATTACK_BLOCKED)'
+Category: Design
+Timestamp: 08-01-2026 00:47:47:170
+Function: eoc::BoostPrototypeManager::CreateBoostPrototype
+Location: EoCShared\Shared\BoostPrototypeManager.cpp (59)
+Message: No Global template found with id e3b43362-8078-1bf6-ce5f-23a9d98faaf0
+Category: Design
+Timestamp: 08-01-2026 00:47:47:263
+Function: ls::GlobalTemplateBank::GetTemplate
+Location: GameEngine\GlobalTemplateBank.cpp (149)
+Message: No Global template found with id 80a1d9ad-2217-50d5-0fbf-7df7212d9f9c
+Category: Design
+Timestamp: 08-01-2026 00:47:47:264
+Function: ls::GlobalTemplateBank::GetTemplate
+Location: GameEngine\GlobalTemplateBank.cpp (149)
+Message: Duplicated effect file names detected for effect 'VFX_Spells_Cast_Rogue_Target_Sneak_Attack_CastFX_03'. Only one of the effect will be used. Files: 
+ C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Public/GustavX/Assets/Effects/Effects_Banks/Spells/Cast/Rogue/VFX_Spells_Cast_Rogue_Target_Sneak_Attack_CastFX_03.lsfx
+ C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Public/GustavX/Assets/Effects/Effects_Banks/Spells/Cast/Ranger/VFX_Spells_Cast_Rogue_Target_Sneak_Attack_CastFX_03.lsfx
+Category: Art
+Timestamp: 08-01-2026 00:47:47:297
+Function: ls::EffectFactory::LoadEffectPaths
+Location: GameEngine\EffectFactory.cpp (293)
+Message: Input type does not match requested type for attribute name "Path" expecting string (20) got LSString (23) with node hierarchy: 'root' -> 'TextureAtlasPath'
+Category: Code
+Timestamp: 08-01-2026 00:47:47:317
+Function: ls::FileNode::GetAttribute
+Location: CoreLib\src\FileNode.cpp (100)
+Message: Trying to hash a not loaded mod! 77a2155f-4b35-4f0c-e7ff-4338f91426a4
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_04 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Trying to hash a not loaded mod! 6efc8f44-cc2a-0273-d4b1-681d3faa411b
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_05 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Trying to hash a not loaded mod! bf19bab4-4908-ef39-9065-ced469c0f877
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::ModLoader::HashLoadedMod
+Location: GameEngine\ModuleLoader.cpp (116)
+Message: Could not hash dependency DiceSet_07 for module Gustav
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::Module::Hash
+Location: GameEngine\Module.cpp (285)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:48:467
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Trying to process a CommunityUGC request but interface is missing
+Category: Code
+Timestamp: 08-01-2026 00:47:48:485
+Function: net::CommunityUGCManagerImpl::ProcessRequest
+Location: GameNet\CommunityUGCManagerImpl.cpp (287)
+Message: Could not find AiModifier for String MULTIPLIER_CONTROL_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:863
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_CONCENTRATION_VALUE
+Category: Design
+Timestamp: 08-01-2026 00:47:48:863
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_AOE_CONTROL
+Category: Design
+Timestamp: 08-01-2026 00:47:48:864
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_DISABLE_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:864
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_CRITICAL
+Category: Design
+Timestamp: 08-01-2026 00:47:48:865
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_ACC_BOOST
+Category: Design
+Timestamp: 08-01-2026 00:47:48:865
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_STEALTH_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_RANGE_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_FLANKING_BONUS
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_HIGH_GROUND_BONUS
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_BUFF_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_BUFF_ALLY
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_HEAL_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_HEAL_ALLY
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_TARGET_ALLY
+Category: Design
+Timestamp: 08-01-2026 00:47:48:867
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_DEFENSIVE_POSITION
+Category: Design
+Timestamp: 08-01-2026 00:47:48:868
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_PROTECT_ALLY
+Category: Design
+Timestamp: 08-01-2026 00:47:48:868
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_TAUNT_PREFERRED
+Category: Design
+Timestamp: 08-01-2026 00:47:48:868
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_FRONTLINE_BONUS
+Category: Design
+Timestamp: 08-01-2026 00:47:48:868
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not find AiModifier for String MULTIPLIER_BONUS_WEAPON_BOOST
+Category: Design
+Timestamp: 08-01-2026 00:47:48:869
+Function: `anonymous-namespace'::AiModifierFromStr
+Location: EoCServer\Server\AiModifiersSystem.cpp (71)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:53:749
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:53:749
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:53:749
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: RootTemplate 'VFX_END_DragonShadow' is pickable/movable but has no icon set!
+
+Message: Cannot find template with id '00000000-0000-0000-0000-000000000000'. It is referenced as template for instance e26ac901-d1c1-44ca-bbee-2859976c88e2
+
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:57:848
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:57:848
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:57:848
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Cannot create visual with parameters: Generated/Editor/Preview/Resources/Preview_Horizontal_Plane_1x1.Dummy_Root.0
+Category: Art
+Timestamp: 08-01-2026 00:47:57:948
+Function: ls::ResourceManager::InstantiateVisualFromName
+Location: GameEngine\ResourceManager.cpp (975)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:066
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:066
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:066
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_07 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:278
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_05 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:278
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: Could not process dependency DiceSet_04 when building dependency list for module Gustav!
+Category: Code
+Timestamp: 08-01-2026 00:47:58:278
+Function: ls::mod::BuildLoadOrderedModulesList
+Location: GameEngine\ModHelper.cpp (117)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_FOR_OwlBear_Cub_001', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:761
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_UND_ScryingEye', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:761
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_GLO_OathbreakerKnight', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:761
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_FOR_Courier_Dog', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:761
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_PLA_ZhentShipment_Spectator', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_TUT_Lab_TrappedDevourer', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_GOB_Eye', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_GLO_GithDragon', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_LOW_SerialKiller_DoppelgangerGiveQuest', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_GLO_YennasCat', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_GLO_HollyphantDetective', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_GLO_HollyphantDetective', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:762
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'UNI_WYR_MysterySpawn_DONOTUSE_000', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'UNI_WYR_MysterySpawn_DONOTUSE_000', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_LOW_SerialKiller_Doppelganger_Backup', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' to 'S_GLO_DevilishOx', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_GLO_Boo', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: esv::tags::TemplateTagComponent* requested to add tag with GUID 'b243e39f-1739-42fe-9b2e-4a72475fd603' to 'S_GLO_Gale_Tressym', but no such tag is found in the tag manager
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:763
+Function: `anonymous-namespace'::ValidateTagExists
+Location: EoCServer\Server\TagSystem.cpp (207)
+Message: Trying to fetch 'Tag' object with id 'b243e39f-1739-42fe-9b2e-4a72475fd603' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id 'b243e39f-1739-42fe-9b2e-4a72475fd603' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id 'b243e39f-1739-42fe-9b2e-4a72475fd603' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id 'b243e39f-1739-42fe-9b2e-4a72475fd603' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id 'b243e39f-1739-42fe-9b2e-4a72475fd603' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to fetch 'Tag' object with id '4d5da4a7-dd41-4ab9-b08b-2a0a9bc2c7eb' from data container 'Tags' but no such object is found
+Category: Systems
+Timestamp: 08-01-2026 00:47:58:799
+Function: ls::ModdableFilesLoader<class ls::Guid,struct ls::Tag>::GetObjectByKey
+Location: GameEngine/ModdableFilesLoader.inl (13)
+Message: Trying to init a level that is already initialized
+Category: Code
+Timestamp: 08-01-2026 00:48:08:467
+Function: ls::LevelData::Init
+Location: GameEngine\LevelData.cpp (62)
+Message: Switching level to Basic_Level_A ...
+
+Message: [NOESIS ERROR] [D:\Jenkins\workspace\Repo\FW4\Main\3rdParty\src\Noesis\3.1.6\Src\Packages\Gui\Core\Src\BitmapImage.cpp:228] "Widgets/LoadingScreen.xaml(199): Image not found '/Core;component/Assets/LoadingScreen/~loadScreen_BG.png'"
+Category: UI
+Timestamp: 08-01-2026 00:48:08:514
+Function: NoesisErrorHandler
+Location: D:\Jenkins\workspace\Repo\FW4\Main\3rdParty\src\Noesis\3.1.6\Src\Packages\Gui\Core\Src\BitmapImage.cpp (228)
+Message: Failed to load chasms. Chasms need to be regenerated for this level
+Category: Design
+Timestamp: 08-01-2026 00:48:11:360
+Function: esv::SurfaceManager::Visit
+Location: EoCServer\Server\SurfaceManager.cpp (640)
+Message: Refresh failed: file(s) do not exist C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_0_0.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_0.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_1_0.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_1.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_2_0.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_2.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_3_0.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_3.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_0_1.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_4.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_1_1.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_5.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_2_1.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_6.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_3_1.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_7.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_0_2.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_8.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_1_2.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_9.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_2_2.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_10.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_3_2.patch, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c_11.bin, C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\Terrains\c3be0720-7d4a-462f-bd81-21bfecbf3b1c.lsf
+
+Message: Could not read granny file 'C:/Program Files (x86)/Steam/steamapps/common/Baldurs Gate 3/Data/Generated/Editor/Gizmos/Resources/Gizmo_Trigger_Lighting.GR2' from disk.
+Error: File can't be opened (for unknown reasons)
+Category: Code
+Timestamp: 08-01-2026 00:48:13:220
+Function: gr::FactoryGr2::Parse
+Location: GrannyBinding\FactoryGr2.cpp (806)
+Message: Cannot create visual with parameters: Generated/Editor/Gizmos/Resources/Gizmo_Trigger_Lighting.Dummy_Root.0
+Category: Art
+Timestamp: 08-01-2026 00:48:13:220
+Function: ls::ResourceManager::InstantiateVisualFromName
+Location: GameEngine\ResourceManager.cpp (975)
+Message: Trying to show a Gizmo that has not visual.
+Category: Code
+Timestamp: 08-01-2026 00:48:13:220
+Function: LSFrameworkPlugin::MPickingGizmo::Show
+Location: D:\Jenkins\workspace\Repo\FW4\Release\Stable\LSProjects\Framework\Plugins\FrameworkPlugin\MPickingGizmo.cpp (82)
+Message: FileAccess: Could not open filename C:\Program Files (x86)\Steam\steamapps\common\Baldurs Gate 3\Data\Mods\Shared\Levels\Basic_Level_A\meta.lsf. Reason It does not exist.
+
+Message: Translation not found for handle [h5b58a9a9g7632g4958g88fagd579fcea5423] with version [0]
+Category: Code
+Timestamp: 08-01-2026 00:48:13:488
+Function: ls::TranslatedStringRepository::Get
+Location: CoreLib\src\TranslatedStringRepository.cpp (652)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:504
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [hbc3975f0g75ecg4de1g9771gba001226b0c7] with version [1], falling back to version [2] (Broken Door).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:513
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h79691b53gf2aag4684g82fcgbfc69a30ecbb] with version [1], falling back to version [2] (Popdrakes).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:524
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h8014daa6g2a95g406bg8a02gb20ca1ff2e80] with version [1], falling back to version [2] (Wogglims).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:525
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h40283679g1b94g41f7g8233gfa4e542adb23] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:525
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h3e15b5fdge48eg4d7ega096g011187dac16c] with version [1], falling back to version [3] (Invasion Plans for the Sword Coast).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:539
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:546
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:546
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h20c9d00fge2e2g49b0g8623g9bb4fb1425ae] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:572
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:579
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [ha2169278g37c1g4c2eg8815g81f8d5c33a24] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:606
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:624
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [head3e2adg2914g4e13gbac0gf67bbeb40ee4] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:624
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:631
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [haca250b7gceefg40b6gafe8ge2f6c6bff4c1] with version [1], falling back to version [3] (Invasion Plans for Baldur's Gate).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:631
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:631
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h93d23483g75c3g4525gaab1g5f5007dabfbe] with version [1], falling back to version [2] (Invasion Plans for Elturgard).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:641
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:641
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:667
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:667
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:669
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:669
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:669
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [hbe83ed2ag54d5g446fgb025g631d9bd9f891] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:676
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h9db5ace3gd52dg4da0g9751g1500160fbdd1] with version [1], falling back to version [2] (Destroyed Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:689
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h31eadf73g464bg495eg8114g9fbea3beaf3c] with version [1], falling back to version [2] (Squidjins).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:703
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:705
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h1db185f7g665bg4abfgab45g14e798dacd64] with version [1], falling back to version [2] (Rags).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:712
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
+Message: Translation not found for handle [h4bc56742gcf27g4782g9935g950eff64cf8c] with version [1], falling back to version [4] (Object).
+Category: Code
+Timestamp: 08-01-2026 00:48:13:719
+Function: ls::TranslatedStringRepository::TryGet
+Location: CoreLib\src\TranslatedStringRepository.cpp (625)
