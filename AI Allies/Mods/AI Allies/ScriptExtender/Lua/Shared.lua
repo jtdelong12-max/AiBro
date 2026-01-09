@@ -133,6 +133,14 @@ local partyCache = nil
 local partyCacheTimer = 0
 local PARTY_CACHE_REFRESH = 500 -- Refresh party cache every 500ms
 
+local function fetchPartyList()
+    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
+    if not partyMembers then
+        return {}
+    end
+    return partyMembers
+end
+
 --- Get all player characters in the party (with caching)
 --- @return table Array of player character UUIDs
 function Shared.GetAllPlayers()
@@ -145,7 +153,7 @@ function Shared.GetAllPlayers()
     
     -- Refresh cache
     local players = {}
-    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
+    local partyMembers = fetchPartyList()
     -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
     for _, member in ipairs(partyMembers) do
         local character = member[1]
@@ -176,7 +184,7 @@ function Shared.GetPartyMembers()
     end
 
     local members = {}
-    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
+    local partyMembers = fetchPartyList()
     -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
     for _, member in ipairs(partyMembers) do
         local character = member[1]
