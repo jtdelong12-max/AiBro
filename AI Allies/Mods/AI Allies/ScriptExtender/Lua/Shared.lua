@@ -132,10 +132,6 @@ local PLAYER_CACHE_REFRESH = 500  -- Refresh player cache every 500ms
 local partyCache = nil
 local partyCacheTimer = 0
 local PARTY_CACHE_REFRESH = 500 -- Refresh party cache every 500ms
-local function resetPartyCache()
-    partyCache = nil
-    partyCacheTimer = 0
-end
 
 --- Get all player characters in the party (with caching)
 --- @return table Array of player character UUIDs
@@ -167,7 +163,6 @@ end
 function Shared.ClearPlayerCache()
     playerCache = nil
     playerCacheTimer = 0
-    resetPartyCache()
 end
 
 --- Get all party members (players and followers) with caching
@@ -197,7 +192,14 @@ end
 
 --- Clear the party cache (call when party composition changes)
 function Shared.ClearPartyCache()
-    resetPartyCache()
+    partyCache = nil
+    partyCacheTimer = 0
+end
+
+--- Clear all cached player and party lookups
+function Shared.ClearAllCaches()
+    Shared.ClearPlayerCache()
+    Shared.ClearPartyCache()
 end
 
 --- Get the player character who owns/summoned an entity
