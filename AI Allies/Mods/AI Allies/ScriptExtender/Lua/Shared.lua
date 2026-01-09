@@ -138,7 +138,14 @@ local function fetchPartyList()
     if not partyMembers then
         return {}
     end
-    return partyMembers
+
+    -- Normalize into a dense array to ensure predictable iteration order
+    local normalized = {}
+    for _, member in pairs(partyMembers) do
+        table.insert(normalized, member)
+    end
+
+    return normalized
 end
 
 --- Get all player characters in the party (with caching)
@@ -174,7 +181,7 @@ function Shared.ClearPlayerCache()
 end
 
 --- Get all party members (players and followers) with caching
---- @return table<string> Array of party member UUIDs
+--- @return string[] Array of party member UUIDs
 function Shared.GetPartyMembers()
     local currentTime = Ext.Utils.MonotonicTime()
 
