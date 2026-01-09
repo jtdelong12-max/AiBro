@@ -128,6 +128,28 @@ local playerCache = nil
 local playerCacheTimer = 0
 local PLAYER_CACHE_REFRESH = 500  -- Refresh player cache every 500ms
 
+-- Performance Optimization: Cache full party list (players + followers)
+local partyCache = nil
+local partyCacheTimer = 0
+local PARTY_CACHE_REFRESH = 500 -- Refresh party cache every 500ms
+
+local function fetchPartyList()
+    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
+    if not partyMembers then
+        return {}
+    end
+
+    -- Normalize into a dense array to ensure predictable iteration order
+    local normalized = {}
+    for _, member in pairs(partyMembers) do
+        if member and member[1] then
+            table.insert(normalized, member[1])
+        end
+    end
+
+    return normalized
+end
+
 --- Get all player characters in the party (with caching)
 --- @return table Array of player character UUIDs
 function Shared.GetAllPlayers()
@@ -140,9 +162,9 @@ function Shared.GetAllPlayers()
     
     -- Refresh cache
     local players = {}
-    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
-    for _, member in pairs(partyMembers) do
-        local character = member[1]
+    local partyMembers = fetchPartyList()
+    -- fetchPartyList normalizes to a dense array of UUIDs; sequential iteration is safe
+    for _, character in ipairs(partyMembers) do
         if Osi.IsPlayer(character) == 1 then
             table.insert(players, character)
         end
@@ -157,6 +179,34 @@ end
 function Shared.ClearPlayerCache()
     playerCache = nil
     playerCacheTimer = 0
+end
+
+--- Get all party members (players and followers) with caching
+--- @return string[] Array of party member UUIDs
+function Shared.GetPartyMembers()
+    local currentTime = Ext.Utils.MonotonicTime()
+
+    -- Return cached result if still valid
+    if partyCache ~= nil and (currentTime - partyCacheTimer) < PARTY_CACHE_REFRESH then
+        return partyCache
+    end
+
+    local members = fetchPartyList()
+    partyCache = members
+    partyCacheTimer = currentTime
+    return members
+end
+
+--- Clear the party cache (call when party composition changes)
+function Shared.ClearPartyCache()
+    partyCache = nil
+    partyCacheTimer = 0
+end
+
+--- Clear all cached player and party lookups
+function Shared.ClearAllCaches()
+    Shared.ClearPlayerCache()
+    Shared.ClearPartyCache()
 end
 
 --- Get the player character who owns/summoned an entity
