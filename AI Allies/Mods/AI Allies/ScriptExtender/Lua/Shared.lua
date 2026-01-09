@@ -170,13 +170,13 @@ function Shared.GetPartyMembers()
     local currentTime = Ext.Utils.MonotonicTime()
 
     -- Return cached result if still valid
-    if partyCache and (currentTime - partyCacheTimer) < PARTY_CACHE_REFRESH then
+    if partyCache ~= nil and (currentTime - partyCacheTimer) < PARTY_CACHE_REFRESH then
         return partyCache
     end
 
     local members = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
-    for _, member in pairs(partyMembers) do
+    for _, member in ipairs(partyMembers) do
         local character = member[1]
         if character then
             table.insert(members, character)
