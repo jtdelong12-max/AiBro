@@ -191,13 +191,7 @@ function Shared.GetPartyMembers()
         return partyCache
     end
 
-    local members = {}
-    local partyMembers = fetchPartyList()
-    -- fetchPartyList normalizes to a dense array of UUIDs; sequential iteration is safe
-    for _, character in ipairs(partyMembers) do
-        table.insert(members, character)
-    end
-
+    local members = fetchPartyList()
     partyCache = members
     partyCacheTimer = currentTime
     return members
