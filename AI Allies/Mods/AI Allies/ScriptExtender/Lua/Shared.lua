@@ -146,7 +146,7 @@ function Shared.GetAllPlayers()
     -- Refresh cache
     local players = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
-    for _, member in pairs(partyMembers) do
+    for _, member in ipairs(partyMembers) do
         local character = member[1]
         if Osi.IsPlayer(character) == 1 then
             table.insert(players, character)
