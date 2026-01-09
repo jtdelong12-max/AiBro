@@ -23,9 +23,8 @@ function Combat.CheckForDownedAllies(caster)
     if Osi.IsPlayer(caster) == 1 then return false end -- Skip real players
 
     local x, y, z = Osi.GetPosition(caster)
-    local allies = Osi.DB_PartOfTheTeam:Get(nil)
-    for _, entry in pairs(allies) do
-        local ally = entry[1]
+    local allies = Shared.GetPartyMembers()
+    for _, ally in ipairs(allies) do
         if ally ~= caster and Osi.IsEnemy(caster, ally) == 0 then
             -- Check if ally is Downed (0 HP / Knocked Out)
             if Osi.HasStatus(ally, "DOWNED") == 1 or Osi.HasStatus(ally, "MAG_KO_CONDITION") == 1 then

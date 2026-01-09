@@ -157,10 +157,8 @@ function AdvancedFeatures.ProcessHealerLogic(entity)
     if not isHealer then return end
     
     -- 2. Scan PARTY MEMBERS for low HP (Standard AI ignores players sometimes, this forces a check)
-    -- We use Osi.DB_PartOfTheTeam to find everyone, including the Player
-    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
-    for _, member in pairs(partyMembers) do
-        local target = member[1]
+    local partyMembers = Shared.GetPartyMembers()
+    for _, target in ipairs(partyMembers) do
         
         -- Don't heal enemies or dead people
         if Shared.CachedExists(target) == 1 and Osi.IsDead(target) == 0 and Osi.IsEnemy(entity, target) == 0 then
