@@ -142,7 +142,9 @@ local function fetchPartyList()
     -- Normalize into a dense array to ensure predictable iteration order
     local normalized = {}
     for _, member in pairs(partyMembers) do
-        table.insert(normalized, member)
+        if member and member[1] then
+            table.insert(normalized, member[1])
+        end
     end
 
     return normalized
@@ -161,9 +163,8 @@ function Shared.GetAllPlayers()
     -- Refresh cache
     local players = {}
     local partyMembers = fetchPartyList()
-    -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
-    for _, member in ipairs(partyMembers) do
-        local character = member[1]
+    -- fetchPartyList normalizes to a dense array of UUIDs; sequential iteration is safe
+    for _, character in ipairs(partyMembers) do
         if Osi.IsPlayer(character) == 1 then
             table.insert(players, character)
         end
@@ -192,12 +193,9 @@ function Shared.GetPartyMembers()
 
     local members = {}
     local partyMembers = fetchPartyList()
-    -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
-    for _, member in ipairs(partyMembers) do
-        local character = member[1]
-        if character then
-            table.insert(members, character)
-        end
+    -- fetchPartyList normalizes to a dense array of UUIDs; sequential iteration is safe
+    for _, character in ipairs(partyMembers) do
+        table.insert(members, character)
     end
 
     partyCache = members
