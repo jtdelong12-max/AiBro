@@ -145,7 +145,8 @@ function Shared.GetAllPlayers()
     
     -- Refresh cache
     local players = {}
-    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil)
+    local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
+    -- DB_PartOfTheTeam returns an array-like list; iterate sequentially for speed
     for _, member in ipairs(partyMembers) do
         local character = member[1]
         if Osi.IsPlayer(character) == 1 then
@@ -176,6 +177,7 @@ function Shared.GetPartyMembers()
 
     local members = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
+    -- DB_PartOfTheTeam returns an array-like list; iterate sequentially for speed
     for _, member in ipairs(partyMembers) do
         local character = member[1]
         if character then
