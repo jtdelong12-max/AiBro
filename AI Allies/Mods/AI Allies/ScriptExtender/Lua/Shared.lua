@@ -132,6 +132,10 @@ local PLAYER_CACHE_REFRESH = 500  -- Refresh player cache every 500ms
 local partyCache = nil
 local partyCacheTimer = 0
 local PARTY_CACHE_REFRESH = 500 -- Refresh party cache every 500ms
+local function resetPartyCache()
+    partyCache = nil
+    partyCacheTimer = 0
+end
 
 --- Get all player characters in the party (with caching)
 --- @return table Array of player character UUIDs
@@ -146,7 +150,7 @@ function Shared.GetAllPlayers()
     -- Refresh cache
     local players = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
-    -- DB_PartOfTheTeam returns an array-like list; iterate sequentially for speed
+    -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
     for _, member in ipairs(partyMembers) do
         local character = member[1]
         if Osi.IsPlayer(character) == 1 then
@@ -163,6 +167,7 @@ end
 function Shared.ClearPlayerCache()
     playerCache = nil
     playerCacheTimer = 0
+    resetPartyCache()
 end
 
 --- Get all party members (players and followers) with caching
@@ -177,7 +182,7 @@ function Shared.GetPartyMembers()
 
     local members = {}
     local partyMembers = Osi.DB_PartOfTheTeam:Get(nil) or {}
-    -- DB_PartOfTheTeam returns an array-like list; iterate sequentially for speed
+    -- DB_PartOfTheTeam returns an array-like list when present; fallback avoids nil iteration
     for _, member in ipairs(partyMembers) do
         local character = member[1]
         if character then
@@ -192,8 +197,7 @@ end
 
 --- Clear the party cache (call when party composition changes)
 function Shared.ClearPartyCache()
-    partyCache = nil
-    partyCacheTimer = 0
+    resetPartyCache()
 end
 
 --- Get the player character who owns/summoned an entity
