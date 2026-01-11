@@ -285,10 +285,8 @@ function Combat.RegisterListeners(CurrentAllies)
     -- StatusRemoved: Remove AI spells when FOR_AI_SPELLS removed
     Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function(character, status, causee, storyActionID)
         if status == STATUS.FOR_AI_SPELLS then
-            local success = SafeOsiCall(Combat.ModifyAISpells, character, false)
-            if success then
-                DebugLog("Removed AI spells from " .. character, "SPELL")
-            end
+            Combat.ModifyAISpells(character, false)
+            DebugLog("Removed AI spells from " .. character, "SPELL")
         end
     end)
     
