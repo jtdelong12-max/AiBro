@@ -22,13 +22,14 @@ local ThrottleEvent = Shared.ThrottleEvent
 function Combat.CheckForDownedAllies(caster)
     if Osi.IsPlayer(caster) == 1 then return false end -- Skip real players
     
-    -- Validate caster exists and get position with error handling
+    -- Validate caster exists
     if not caster or CachedExists(caster) ~= 1 then
         DebugLog("[ERROR] Invalid caster in CheckForDownedAllies", "COMBAT")
         return false
     end
     
-    local success, x, y, z = SafeOsiCall(Osi.GetPosition, caster)
+    -- Get position with error handling (GetPosition returns multiple values, can't use SafeOsiCall)
+    local success, x, y, z = pcall(Osi.GetPosition, caster)
     if not success or not x or not y or not z then
         DebugLog("[ERROR] Failed to get caster position in CheckForDownedAllies", "COMBAT")
         return false

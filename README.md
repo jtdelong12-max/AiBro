@@ -385,7 +385,7 @@ This mod is released for personal use in Baldur's Gate 3.
 
 ### Documentation
 - [Configuration Guide](CONFIGURATION.md) - Detailed MCM settings documentation
-- [Module Structure](AI%20Allies/Mods/AI%20Allies/ScriptExtender/Lua/MODULE_STRUCTURE.md) - Technical documentation
+- [Module Structure](AI%20Allies/Mods/AI%20Allies/ScriptExtender/Lua/MODULE_STRUCTURE.md) - Technical documentation for developers
 
 ### Community
 - Report issues on GitHub Issues

@@ -53,7 +53,10 @@ end
 --- - The target entity was destroyed before timer fired
 --- - Combat ended before combat timer fired
 --- - Character left party before character timer fired
-local function CleanupExpiredTimers()
+--- @param characterTimers table Reference to character timers table
+--- @param spellTimers table Reference to spell modification timers table
+--- @param combatTimers table Reference to combat timers table
+local function CleanupExpiredTimers(characterTimers, spellTimers, combatTimers)
     local currentTime = Ext.Utils.MonotonicTime()
     local cleanedCount = 0
     
@@ -65,9 +68,9 @@ local function CleanupExpiredTimers()
             DebugLog("[TIMER CLEANUP] Removing expired timer: " .. timerName .. " (age: " .. age .. "ms)", "TIMER")
             
             -- Clean up from tracking tables
-            Mods.AIAllies.characterTimers[timerName] = nil
-            Mods.AIAllies.spellModificationTimers[timerName] = nil
-            Mods.AIAllies.combatTimers[timerName] = nil
+            if characterTimers then characterTimers[timerName] = nil end
+            if spellTimers then spellTimers[timerName] = nil end
+            if combatTimers then combatTimers[timerName] = nil end
             
             activeTimers[timerName] = nil
             cleanedCount = cleanedCount + 1
@@ -101,7 +104,11 @@ function Timer.RegisterListeners(CurrentAllies)
     Ext.Osiris.RegisterListener("TimerFinished", 1, "after", function(timer)
         -- Handle periodic timer cleanup
         if timer == "AIAllies_TimerCleanup" then
-            CleanupExpiredTimers()
+            CleanupExpiredTimers(
+                Mods.AIAllies.characterTimers,
+                Mods.AIAllies.spellModificationTimers,
+                Mods.AIAllies.combatTimers
+            )
             -- Relaunch cleanup timer
             Osi.TimerLaunch("AIAllies_TimerCleanup", TIMER_CLEANUP_INTERVAL)
             return

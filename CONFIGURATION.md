@@ -488,9 +488,16 @@ Activates the automatic healing system where allies with healing capabilities au
 
 **Customization:**
 
-To adjust auto-heal threshold, edit `Shared.lua`:
+To adjust auto-heal threshold, edit the `CONSTANTS` table in `Shared.lua`:
 ```lua
-AUTO_HEAL_THRESHOLD = 0.5,  -- 50% HP threshold
+Shared.CONSTANTS = {
+    -- ... other constants ...
+    
+    -- Advanced features
+    AUTO_HEAL_THRESHOLD = 0.5,     -- Health percentage to trigger auto-heal (50%)
+    
+    -- ... other constants ...
+}
 ```
 
 Change to:
