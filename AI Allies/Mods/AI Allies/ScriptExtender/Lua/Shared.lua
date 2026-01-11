@@ -21,6 +21,19 @@ Shared.CONSTANTS = {
     FOR_AI_SPELLS_DURATION = -1,
     
     -- Performance optimization
+    -- Cache refresh intervals balance performance vs. responsiveness:
+    --
+    -- ENTITY_CACHE_REFRESH (1000ms = 1 second):
+    -- - Entity existence checks are expensive (query game engine)
+    -- - Most entities don't appear/disappear rapidly
+    -- - 1s refresh provides good balance: responsive enough for combat, efficient for performance
+    -- - Prevents redundant existence checks on same entity within 1s window
+    --
+    -- EVENT_THROTTLE_DELAY (100ms):
+    -- - Prevents event spam when same event fires rapidly
+    -- - Common with status changes, turn events, position updates
+    -- - 100ms is imperceptible to players but prevents processing duplicate events
+    -- - Critical for preventing infinite loops or cascading event chains
     ENTITY_CACHE_REFRESH = 1000,  -- How often to refresh entity existence cache (ms)
     EVENT_THROTTLE_DELAY = 100,    -- Minimum delay between identical event processing (ms)
     

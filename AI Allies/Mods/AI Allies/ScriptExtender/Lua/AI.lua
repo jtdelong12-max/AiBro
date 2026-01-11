@@ -16,7 +16,9 @@ local CachedExists = Shared.CachedExists
 ----------------------------------------------------------------------------------
 -- Status Lists and Tracking
 ----------------------------------------------------------------------------------
--- List of AI statuses to track for CurrentAllies
+-- List of AI controller statuses to track for CurrentAllies
+-- These statuses indicate that a character should be AI-controlled
+-- Controller statuses are applied outside of combat and persist across encounters
 AI.aiStatuses = {
     STATUS.MELEE_CONTROLLER,
     STATUS.RANGED_CONTROLLER,
@@ -40,7 +42,9 @@ AI.aiStatuses = {
     STATUS.CONTROLLER_CONTROLLER
 }
 
--- List of all combat statuses
+-- List of all combat statuses (applied during combat for actual AI behavior)
+-- These statuses are what the game's AI system actually reads to determine behavior
+-- They are temporary and get applied/removed based on the controller status
 AI.aiCombatStatuses = {
     STATUS.MELEE,
     STATUS.RANGED,
@@ -61,7 +65,9 @@ AI.aiCombatStatuses = {
     STATUS.SCOUT,
     STATUS.TANK,
     STATUS.CONTROLLER,
-    -- NPC variants
+    -- NPC variants (used when ToggleIsNPC is active)
+    -- NPC variants use different AI behaviors optimized for non-player characters
+    -- This is necessary because BG3 treats player-controlled and NPC entities differently
     STATUS.MELEE_NPC,
     STATUS.RANGED_NPC,
     STATUS.HEALER_MELEE_NPC,
@@ -83,7 +89,10 @@ AI.aiCombatStatuses = {
     STATUS.CONTROLLER_NPC
 }
 
--- List of NPC statuses
+-- List of NPC-specific statuses
+-- NPC statuses exist because BG3's AI system has separate behavior trees for NPCs
+-- When a companion needs to act fully autonomous (e.g., during dialogs), 
+-- we convert them to NPC temporarily and apply NPC combat statuses
 AI.NPCStatuses = {
     STATUS.MELEE_NPC,
     STATUS.RANGED_NPC,
@@ -107,6 +116,11 @@ AI.NPCStatuses = {
 }
 
 -- Mapping of controller buffs to combat status buffs
+-- This translation system allows us to:
+-- 1. Apply persistent controller status outside combat (player maintains control)
+-- 2. Automatically translate to combat status when combat starts
+-- 3. Remove combat status when combat ends (returns control to player)
+-- This approach prevents companions from being AI-controlled during exploration/dialog
 AI.controllerToStatusTranslator = {
     [STATUS.MELEE_CONTROLLER] = STATUS.MELEE,
     [STATUS.RANGED_CONTROLLER] = STATUS.RANGED,

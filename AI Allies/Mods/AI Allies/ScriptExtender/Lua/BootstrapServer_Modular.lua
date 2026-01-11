@@ -49,23 +49,27 @@ Mods.AIAllies.Debug = CONSTANTS.DEBUG_MODE
 ----------------------------------------------------------------------------------
 -- Persistent State Management
 ----------------------------------------------------------------------------------
+-- PersistentVars stores data that survives game saves/loads
+-- This is critical for maintaining AI ally assignments across sessions
 Mods.AIAllies.PersistentVars = Mods.AIAllies.PersistentVars or {}
 Mods.AIAllies.PersistentVars.CurrentAllies = Mods.AIAllies.PersistentVars.CurrentAllies or {}
 Mods.AIAllies.PersistentVars.charactersUnderMindControl = Mods.AIAllies.PersistentVars.charactersUnderMindControl or {}
 
--- Runtime state
-CurrentAllies = Mods.AIAllies.PersistentVars.CurrentAllies
-Mods.AIAllies.characterTimers = {}
-Mods.AIAllies.wildshapeTimers = {}
-Mods.AIAllies.spellModificationQueue = {}
-Mods.AIAllies.spellModificationTimers = {}
-Mods.AIAllies.currentlyProcessing = false
-Mods.AIAllies.modifiedCharacters = {}
-Mods.AIAllies.appliedStatuses = {}
-Mods.AIAllies.combatTimers = {}
-Mods.AIAllies.combatStartTimes = {}
+-- Runtime state (cleared on game restart, not saved)
+-- These tables manage temporary states and pending operations
+CurrentAllies = Mods.AIAllies.PersistentVars.CurrentAllies  -- Main tracking table: {uuid = true} for all AI allies
+Mods.AIAllies.characterTimers = {}  -- Pending character additions: {timerName = uuid}
+Mods.AIAllies.wildshapeTimers = {}  -- Wildshape status cleanup timers
+Mods.AIAllies.spellModificationQueue = {}  -- Queued spell modifications
+Mods.AIAllies.spellModificationTimers = {}  -- Pending spell modification callbacks: {timerName = callback}
+Mods.AIAllies.currentlyProcessing = false  -- Prevents concurrent modifications
+Mods.AIAllies.modifiedCharacters = {}  -- Tracks which characters have AI spells: {uuid = true}
+Mods.AIAllies.appliedStatuses = {}  -- Tracks temporary statuses applied during turns: {uuid = statusName}
+Mods.AIAllies.combatTimers = {}  -- Combat initialization timers: {timerName = combatGuid}
+Mods.AIAllies.combatStartTimes = {}  -- Combat start timestamps for timeout detection: {combatGuid = timestamp}
 
 -- Export BootstrapServer for global module access
+-- This allows other modules (Formations, Dialog, etc.) to access CurrentAllies
 BootstrapServer = BootstrapServer or {}
 BootstrapServer.CurrentAllies = CurrentAllies
 
@@ -83,13 +87,22 @@ end
 ----------------------------------------------------------------------------------
 -- Core Event Listeners
 ----------------------------------------------------------------------------------
--- Character addition/removal based on controller status
+-- Character addition/removal workflow:
+-- 1. Controller status applied → Start CHARACTER_ADD_DELAY timer (1000ms)
+-- 2. Timer expires → Add character to CurrentAllies
+-- 3. Combat starts → Apply AI_ALLY and combat status
+-- 4. Controller status removed → Immediately remove from CurrentAllies
+-- 5. AI_CANCEL status applied → Immediately remove from CurrentAllies
+--
+-- The delay prevents premature addition during status application spam
+-- and gives the game engine time to fully initialize the character state
 Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
     if AI.isControllerStatus(status) and Osi.IsPartyFollower(object) == 0 then
         local uuid = Osi.GetUUID(object)
         local PFtimer = "AddToAlliesTimer_" .. uuid
         Osi.TimerLaunch(PFtimer, CONSTANTS.CHARACTER_ADD_DELAY)
         Mods.AIAllies.characterTimers[PFtimer] = uuid
+        Timer.RegisterTimer(PFtimer, "character")
         DebugLog("Started timer for " .. uuid, "TIMER")
     end
 end)

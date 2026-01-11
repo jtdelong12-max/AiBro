@@ -5,6 +5,7 @@
 
 local Shared = Ext.Require("Shared.lua")
 local AI = Ext.Require("AI.lua")
+local Timer = Ext.Require("Timer.lua")
 local Combat = {}
 
 -- Export shared references
@@ -21,28 +22,59 @@ local ThrottleEvent = Shared.ThrottleEvent
 --- @return boolean acted True if a rescue action was issued
 function Combat.CheckForDownedAllies(caster)
     if Osi.IsPlayer(caster) == 1 then return false end -- Skip real players
+    
+    -- Validate caster exists
+    if not caster or CachedExists(caster) ~= 1 then
+        DebugLog("[ERROR] Invalid caster in CheckForDownedAllies", "COMBAT")
+        return false
+    end
+    
+    -- Get position with error handling
+    -- Note: GetPosition returns multiple values (x, y, z), so we use pcall directly
+    -- instead of SafeOsiCall which only captures the first return value
+    local success, x, y, z = pcall(Osi.GetPosition, caster)
+    if not success or not x or not y or not z then
+        DebugLog("[ERROR] Failed to get caster position in CheckForDownedAllies", "COMBAT")
+        return false
+    end
 
-    local x, y, z = Osi.GetPosition(caster)
     local allies = Shared.GetPartyMembers()
     for _, ally in ipairs(allies) do
-        if ally ~= caster and Osi.IsEnemy(caster, ally) == 0 then
-            -- Check if ally is Downed (0 HP / Knocked Out)
-            if Osi.HasStatus(ally, "DOWNED") == 1 or Osi.HasStatus(ally, "MAG_KO_CONDITION") == 1 then
-                local dist = Osi.GetDistanceTo(caster, ally)
+        -- Skip if ally is not valid or is the caster
+        if ally ~= caster and CachedExists(ally) == 1 then
+            local success2, isEnemy = SafeOsiCall(Osi.IsEnemy, caster, ally)
+            if success2 and isEnemy == 0 then
+                -- Check if ally is Downed (0 HP / Knocked Out)
+                local hasDownedStatus = Osi.HasStatus(ally, "DOWNED") == 1 or Osi.HasStatus(ally, "MAG_KO_CONDITION") == 1
+                if hasDownedStatus then
+                    -- Get distance with error handling
+                    local distSuccess, dist = SafeOsiCall(Osi.GetDistanceTo, caster, ally)
+                    if distSuccess and dist and dist >= 0 then
+                        -- Priority 1: Use HELP (Range 3m)
+                        if dist <= 3.0 then
+                            Ext.Utils.Print("[Medic] " .. caster .. " is helping downed ally " .. ally)
+                            local spellSuccess = SafeOsiCall(Osi.UseSpell, caster, "Target_Help", ally)
+                            if spellSuccess then
+                                return true -- Action taken
+                            end
+                        end
 
-                -- Priority 1: Use HELP (Range 3m)
-                if dist <= 3.0 then
-                    Ext.Utils.Print("[Medic] " .. caster .. " is helping downed ally " .. ally)
-                    Osi.UseSpell(caster, "Target_Help", ally)
-                    return true -- Action taken
-                end
-
-                -- Priority 2: Ranged Heal (Healing Word - Range 18m)
-                -- Only if they actually have the spell
-                if dist <= 18.0 and Osi.HasSpell(caster, "Target_HealingWord") == 1 then
-                    Ext.Utils.Print("[Medic] " .. caster .. " is reviving " .. ally .. " with Healing Word")
-                    Osi.UseSpell(caster, "Target_HealingWord", ally)
-                    return true -- Action taken
+                        -- Priority 2: Ranged Heal (Healing Word - Range 18m)
+                        -- Only if they actually have the spell
+                        if dist <= 18.0 then
+                            local hasSpellSuccess, hasSpell = SafeOsiCall(Osi.HasSpell, caster, "Target_HealingWord")
+                            if hasSpellSuccess and hasSpell == 1 then
+                                Ext.Utils.Print("[Medic] " .. caster .. " is reviving " .. ally .. " with Healing Word")
+                                local spellSuccess2 = SafeOsiCall(Osi.UseSpell, caster, "Target_HealingWord", ally)
+                                if spellSuccess2 then
+                                    return true -- Action taken
+                                end
+                            end
+                        end
+                    else
+                        DebugLog("[WARNING] Failed to get distance between " .. caster .. " and " .. ally, "COMBAT")
+                        -- Continue to next ally instead of crashing
+                    end
                 end
             end
         end
@@ -55,6 +87,12 @@ end
 -- Spell Mappings and Modifications
 ----------------------------------------------------------------------------------
 -- Mapping of original spells to their AI versions
+-- Why AI spell variants are needed:
+-- 1. BG3's AI system has restrictions on which spells it can use
+-- 2. Some player abilities (Action Surge, Dash, Rage) have action costs that conflict with AI logic
+-- 3. AI variants have adjusted costs, cooldowns, or behavior flags for AI compatibility
+-- 4. This allows the same character to use player versions manually and AI versions automatically
+-- 5. When combat starts, we swap in AI versions; when it ends, we restore originals
 local spellMappings = {
     [SPELL.ACTION_SURGE] = SPELL.ACTION_SURGE_AI,
     [SPELL.DASH] = SPELL.DASH_AI,
@@ -122,6 +160,7 @@ function Combat.RegisterListeners(CurrentAllies)
         Mods.AIAllies.combatTimers[InitializeTimerAI] = combatGuid
         Mods.AIAllies.combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
         Osi.TimerLaunch(InitializeTimerAI, CONSTANTS.COMBAT_RESUME_DELAY)
+        Timer.RegisterTimer(InitializeTimerAI, "combat")
     end)
     
     -- EnteredCombat: Apply archetype and AI statuses
@@ -239,16 +278,15 @@ function Combat.RegisterListeners(CurrentAllies)
                 Combat.ModifyAISpells(character, true)
             end
             Osi.TimerLaunch(timerName, CONSTANTS.SPELL_MODIFICATION_DELAY)
+            Timer.RegisterTimer(timerName, "spell")
         end
     end)
     
     -- StatusRemoved: Remove AI spells when FOR_AI_SPELLS removed
     Ext.Osiris.RegisterListener("StatusRemoved", 4, "after", function(character, status, causee, storyActionID)
         if status == STATUS.FOR_AI_SPELLS then
-            local success = SafeOsiCall(Combat.ModifyAISpells, character, false)
-            if success then
-                DebugLog("Removed AI spells from " .. character, "SPELL")
-            end
+            Combat.ModifyAISpells(character, false)
+            DebugLog("Removed AI spells from " .. character, "SPELL")
         end
     end)
     
@@ -258,6 +296,7 @@ function Combat.RegisterListeners(CurrentAllies)
             local wildshapeTimer = "WildshapeForceRemove_" .. object .. "_" .. status
             Mods.AIAllies.characterTimers[wildshapeTimer] = {object = object, status = status}
             Osi.TimerLaunch(wildshapeTimer, CONSTANTS.WILDSHAPE_REMOVAL_DELAY)
+            Timer.RegisterTimer(wildshapeTimer, "wildshape")
         end
     end)
 end

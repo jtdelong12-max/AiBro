@@ -11,32 +11,58 @@ local formationData = {}
 local formationTimerStarted = false
 
 --- Formation types with position offsets
+-- Each formation type defines tactical positioning relative to the party leader
+-- Positions are in (x, y) offsets where:
+--   x = lateral positioning (negative = left, positive = right)
+--   y = depth positioning (negative = behind, positive = ahead)
+-- The FORMATION_DISTANCE constant (3.0m) scales these offsets
+--
+-- FRONTLINE: Melee combatants positioned ahead of the leader
+--   - Forms a defensive line to engage enemies first
+--   - Ideal for tanks and melee DPS
+--   - Close spacing for mutual support and blocking chokepoints
+--
+-- MIDLINE: Balanced positioning slightly behind the front
+--   - Versatile positioning for hybrid combatants
+--   - Can support frontline or fall back to backline as needed
+--   - Good for off-tanks, spellswords, and flexible fighters
+--
+-- BACKLINE: Ranged combatants positioned well behind the leader
+--   - Maximum safety for vulnerable ranged attackers
+--   - Clear line of sight over frontline for ranged attacks
+--   - Ideal for mages, archers, and healers
+--   - Staggered positions prevent AoE clustering
+--
+-- SCATTERED: No fixed formation, free tactical movement
+--   - Allows AI to position opportunistically
+--   - Best for scouts, rogues, and mobile skirmishers
+--   - Enables flanking and hit-and-run tactics
 local FORMATION_TYPES = {
     FRONTLINE = {
         positions = {
-            {x = 0, y = 0},
-            {x = -2, y = 0},
-            {x = 2, y = 0},
-            {x = -4, y = 0},
-            {x = 4, y = 0}
+            {x = 0, y = 0},      -- Center front
+            {x = -2, y = 0},     -- Left front
+            {x = 2, y = 0},      -- Right front
+            {x = -4, y = 0},     -- Far left front
+            {x = 4, y = 0}       -- Far right front
         }
     },
     MIDLINE = {
         positions = {
-            {x = 0, y = 0},
-            {x = -2, y = -2},
-            {x = 2, y = -2},
-            {x = -4, y = -4},
-            {x = 4, y = -4}
+            {x = 0, y = 0},      -- Center mid
+            {x = -2, y = -2},    -- Left mid, slightly back
+            {x = 2, y = -2},     -- Right mid, slightly back
+            {x = -4, y = -4},    -- Far left mid, further back
+            {x = 4, y = -4}      -- Far right mid, further back
         }
     },
     BACKLINE = {
         positions = {
-            {x = 0, y = -3},
-            {x = -2, y = -5},
-            {x = 2, y = -5},
-            {x = -4, y = -7},
-            {x = 4, y = -7}
+            {x = 0, y = -3},     -- Center back
+            {x = -2, y = -5},    -- Left back, staggered
+            {x = 2, y = -5},     -- Right back, staggered
+            {x = -4, y = -7},    -- Far left back, maximum safety
+            {x = 4, y = -7}      -- Far right back, maximum safety
         }
     },
     SCATTERED = nil  -- No fixed positions, free movement
