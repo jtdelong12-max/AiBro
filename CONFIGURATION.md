@@ -664,9 +664,9 @@ Unlocks three distinct aggression modes that modify how aggressively AI allies e
 3. Below Threshold < 50%
 
 **To Modify Threshold:**
-Edit `Shared.lua` line 32:
+Edit the `AUTO_HEAL_THRESHOLD` constant in `Shared.lua`:
 ```lua
-AUTO_HEAL_THRESHOLD = 0.5,  -- Change this value
+AUTO_HEAL_THRESHOLD = 0.5,  -- Change this value (default 50%)
 ```
 
 ---

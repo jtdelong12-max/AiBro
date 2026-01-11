@@ -36,6 +36,7 @@ function Combat.CheckForDownedAllies(caster)
 
     local allies = Shared.GetPartyMembers()
     for _, ally in ipairs(allies) do
+        -- Skip if ally is not valid or is the caster
         if ally ~= caster and CachedExists(ally) == 1 then
             local success2, isEnemy = SafeOsiCall(Osi.IsEnemy, caster, ally)
             if success2 and isEnemy == 0 then
@@ -44,37 +45,35 @@ function Combat.CheckForDownedAllies(caster)
                 if hasDownedStatus then
                     -- Get distance with error handling
                     local distSuccess, dist = SafeOsiCall(Osi.GetDistanceTo, caster, ally)
-                    if not distSuccess or not dist or dist < 0 then
-                        DebugLog("[WARNING] Failed to get distance between " .. caster .. " and " .. ally, "COMBAT")
-                        -- Continue to next ally instead of crashing
-                        goto continue
-                    end
-
-                    -- Priority 1: Use HELP (Range 3m)
-                    if dist <= 3.0 then
-                        Ext.Utils.Print("[Medic] " .. caster .. " is helping downed ally " .. ally)
-                        local spellSuccess = SafeOsiCall(Osi.UseSpell, caster, "Target_Help", ally)
-                        if spellSuccess then
-                            return true -- Action taken
-                        end
-                    end
-
-                    -- Priority 2: Ranged Heal (Healing Word - Range 18m)
-                    -- Only if they actually have the spell
-                    if dist <= 18.0 then
-                        local hasSpellSuccess, hasSpell = SafeOsiCall(Osi.HasSpell, caster, "Target_HealingWord")
-                        if hasSpellSuccess and hasSpell == 1 then
-                            Ext.Utils.Print("[Medic] " .. caster .. " is reviving " .. ally .. " with Healing Word")
-                            local spellSuccess2 = SafeOsiCall(Osi.UseSpell, caster, "Target_HealingWord", ally)
-                            if spellSuccess2 then
+                    if distSuccess and dist and dist >= 0 then
+                        -- Priority 1: Use HELP (Range 3m)
+                        if dist <= 3.0 then
+                            Ext.Utils.Print("[Medic] " .. caster .. " is helping downed ally " .. ally)
+                            local spellSuccess = SafeOsiCall(Osi.UseSpell, caster, "Target_Help", ally)
+                            if spellSuccess then
                                 return true -- Action taken
                             end
                         end
+
+                        -- Priority 2: Ranged Heal (Healing Word - Range 18m)
+                        -- Only if they actually have the spell
+                        if dist <= 18.0 then
+                            local hasSpellSuccess, hasSpell = SafeOsiCall(Osi.HasSpell, caster, "Target_HealingWord")
+                            if hasSpellSuccess and hasSpell == 1 then
+                                Ext.Utils.Print("[Medic] " .. caster .. " is reviving " .. ally .. " with Healing Word")
+                                local spellSuccess2 = SafeOsiCall(Osi.UseSpell, caster, "Target_HealingWord", ally)
+                                if spellSuccess2 then
+                                    return true -- Action taken
+                                end
+                            end
+                        end
+                    else
+                        DebugLog("[WARNING] Failed to get distance between " .. caster .. " and " .. ally, "COMBAT")
+                        -- Continue to next ally instead of crashing
                     end
                 end
             end
         end
-        ::continue::
     end
 
     return false

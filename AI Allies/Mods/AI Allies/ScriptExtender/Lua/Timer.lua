@@ -85,6 +85,14 @@ local function InitializeTimerCleanup()
     Osi.TimerLaunch("AIAllies_TimerCleanup", TIMER_CLEANUP_INTERVAL)
 end
 
+--- Stop timer cleanup system
+local function StopTimerCleanup()
+    -- Cancel the cleanup timer (BG3 automatically cancels all timers on session end,
+    -- but we clear the tracking table to prevent issues on reload)
+    activeTimers = {}
+    DebugLog("[TIMER] Timer cleanup system stopped", "TIMER")
+end
+
 ----------------------------------------------------------------------------------
 -- Timer Registration
 ----------------------------------------------------------------------------------
@@ -145,6 +153,11 @@ function Timer.RegisterListeners(CurrentAllies)
     Ext.Events.SessionLoaded:Subscribe(function()
         InitializeTimerCleanup()
         DebugLog("[TIMER] Timer cleanup system initialized", "TIMER")
+    end)
+    
+    -- Stop timer cleanup on session ending
+    Ext.Events.SessionEnding:Subscribe(function()
+        StopTimerCleanup()
     end)
 end
 
