@@ -5,6 +5,7 @@
 
 local Shared = Ext.Require("Shared.lua")
 local AI = Ext.Require("AI.lua")
+local Timer = Ext.Require("Timer.lua")
 local Combat = {}
 
 -- Export shared references
@@ -28,7 +29,9 @@ function Combat.CheckForDownedAllies(caster)
         return false
     end
     
-    -- Get position with error handling (GetPosition returns multiple values, can't use SafeOsiCall)
+    -- Get position with error handling
+    -- Note: GetPosition returns multiple values (x, y, z), so we use pcall directly
+    -- instead of SafeOsiCall which only captures the first return value
     local success, x, y, z = pcall(Osi.GetPosition, caster)
     if not success or not x or not y or not z then
         DebugLog("[ERROR] Failed to get caster position in CheckForDownedAllies", "COMBAT")
@@ -157,6 +160,7 @@ function Combat.RegisterListeners(CurrentAllies)
         Mods.AIAllies.combatTimers[InitializeTimerAI] = combatGuid
         Mods.AIAllies.combatStartTimes[combatGuid] = Ext.Utils.MonotonicTime()
         Osi.TimerLaunch(InitializeTimerAI, CONSTANTS.COMBAT_RESUME_DELAY)
+        Timer.RegisterTimer(InitializeTimerAI, "combat")
     end)
     
     -- EnteredCombat: Apply archetype and AI statuses
@@ -274,6 +278,7 @@ function Combat.RegisterListeners(CurrentAllies)
                 Combat.ModifyAISpells(character, true)
             end
             Osi.TimerLaunch(timerName, CONSTANTS.SPELL_MODIFICATION_DELAY)
+            Timer.RegisterTimer(timerName, "spell")
         end
     end)
     
@@ -293,6 +298,7 @@ function Combat.RegisterListeners(CurrentAllies)
             local wildshapeTimer = "WildshapeForceRemove_" .. object .. "_" .. status
             Mods.AIAllies.characterTimers[wildshapeTimer] = {object = object, status = status}
             Osi.TimerLaunch(wildshapeTimer, CONSTANTS.WILDSHAPE_REMOVAL_DELAY)
+            Timer.RegisterTimer(wildshapeTimer, "wildshape")
         end
     end)
 end

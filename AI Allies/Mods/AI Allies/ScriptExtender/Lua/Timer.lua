@@ -35,7 +35,7 @@ local TIMER_MAX_AGE = 300000  -- Consider timers older than 5 minutes as expired
 --- Register a timer for tracking
 --- @param timerName string The timer identifier
 --- @param timerType string The type of timer (character, combat, spell, wildshape)
-local function RegisterTimer(timerName, timerType)
+function Timer.RegisterTimer(timerName, timerType)
     activeTimers[timerName] = {
         type = timerType,
         timestamp = Ext.Utils.MonotonicTime()

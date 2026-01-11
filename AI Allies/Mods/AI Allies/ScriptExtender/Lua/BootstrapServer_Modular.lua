@@ -102,6 +102,7 @@ Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status
         local PFtimer = "AddToAlliesTimer_" .. uuid
         Osi.TimerLaunch(PFtimer, CONSTANTS.CHARACTER_ADD_DELAY)
         Mods.AIAllies.characterTimers[PFtimer] = uuid
+        Timer.RegisterTimer(PFtimer, "character")
         DebugLog("Started timer for " .. uuid, "TIMER")
     end
 end)
