@@ -107,8 +107,11 @@ end
 --- @param leader string Leader UUID
 --- @param formationType string Formation type
 --- @param positionIndex number Position index in formation (0-based)
+--- @param leaderX number|nil Optional pre-fetched leader X coordinate
+--- @param leaderY number|nil Optional pre-fetched leader Y coordinate
+--- @param leaderZ number|nil Optional pre-fetched leader Z coordinate
 --- @return number|nil, number|nil, number|nil x, y, z coordinates or nil if error
-function Formations.CalculateFormationPosition(entity, leader, formationType, positionIndex)
+function Formations.CalculateFormationPosition(entity, leader, formationType, positionIndex, leaderX, leaderY, leaderZ)
     -- Validate entities exist
     if not entity or not Shared.CachedExists(entity) then
         Shared.DebugLog("Formation", "[ERROR] Invalid entity in CalculateFormationPosition")
@@ -128,10 +131,12 @@ function Formations.CalculateFormationPosition(entity, leader, formationType, po
     end
     
     -- Get leader position with error handling
-    local leaderX, leaderY, leaderZ = Osi.GetPosition(leader)
     if not leaderX or not leaderY or not leaderZ then
-        Shared.DebugLog("Formation", "[ERROR] Failed to get position for leader " .. leader)
-        return nil, nil, nil
+        leaderX, leaderY, leaderZ = Osi.GetPosition(leader)
+        if not leaderX or not leaderY or not leaderZ then
+            Shared.DebugLog("Formation", "[ERROR] Failed to get position for leader " .. leader)
+            return nil, nil, nil
+        end
     end
     
     -- Validate position index
@@ -198,25 +203,33 @@ function Formations.UpdateFormations()
     local positionsUpdated = 0
     for groupKey, group in pairs(formationGroups) do
         if #group.members > 0 then
-            for index, ally in ipairs(group.members) do
-                local x, y, z = Formations.CalculateFormationPosition(
-                    ally,
-                    group.leader,
-                    group.formationType,
-                    index - 1
-                )
-                
-                -- Store ideal position (actual movement controlled by AI)
-                if x and y and z then
-                    formationData[ally] = {
-                        targetX = x,
-                        targetY = y,
-                        targetZ = z,
-                        leader = group.leader,
-                        formationType = group.formationType
-                    }
-                    positionsUpdated = positionsUpdated + 1
+            local leaderX, leaderY, leaderZ = Osi.GetPosition(group.leader)
+            if leaderX and leaderY and leaderZ then
+                for index, ally in ipairs(group.members) do
+                    local x, y, z = Formations.CalculateFormationPosition(
+                        ally,
+                        group.leader,
+                        group.formationType,
+                        index - 1,
+                        leaderX,
+                        leaderY,
+                        leaderZ
+                    )
+                    
+                    -- Store ideal position (actual movement controlled by AI)
+                    if x and y and z then
+                        formationData[ally] = {
+                            targetX = x,
+                            targetY = y,
+                            targetZ = z,
+                            leader = group.leader,
+                            formationType = group.formationType
+                        }
+                        positionsUpdated = positionsUpdated + 1
+                    end
                 end
+            else
+                Shared.DebugLog("Formation", "[ERROR] Failed to get position for leader " .. tostring(group.leader))
             end
         end
     end
