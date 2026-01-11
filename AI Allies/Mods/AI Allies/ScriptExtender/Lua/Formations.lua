@@ -107,6 +107,9 @@ end
 --- @param leader string Leader UUID
 --- @param formationType string Formation type
 --- @param positionIndex number Position index in formation (0-based)
+--- @param leaderX number|nil Optional pre-fetched leader X coordinate
+--- @param leaderY number|nil Optional pre-fetched leader Y coordinate
+--- @param leaderZ number|nil Optional pre-fetched leader Z coordinate
 --- @return number|nil, number|nil, number|nil x, y, z coordinates or nil if error
 function Formations.CalculateFormationPosition(entity, leader, formationType, positionIndex, leaderX, leaderY, leaderZ)
     -- Validate entities exist
