@@ -93,6 +93,10 @@ end
 -- 3. AI variants have adjusted costs, cooldowns, or behavior flags for AI compatibility
 -- 4. This allows the same character to use player versions manually and AI versions automatically
 -- 5. When combat starts, we swap in AI versions; when it ends, we restore originals
+--
+-- NOTE: This system automatically works with modded equipment and most modded spells
+-- because AI uses the character's spell list directly. Only spells that require
+-- special AI variants (like the ones below) need explicit mapping.
 local spellMappings = {
     [SPELL.ACTION_SURGE] = SPELL.ACTION_SURGE_AI,
     [SPELL.DASH] = SPELL.DASH_AI,

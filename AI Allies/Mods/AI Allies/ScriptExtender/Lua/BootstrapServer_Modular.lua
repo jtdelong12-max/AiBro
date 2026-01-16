@@ -27,6 +27,7 @@ local Formations = Ext.Require("Formations.lua")
 local AdvancedFeatures = Ext.Require("AdvancedFeatures.lua")
 local Eldertide = Ext.Require("Eldertide.lua")
 local Tactics = Ext.Require("Tactics.lua")
+local SpellControl = Ext.Require("SpellControl.lua")
 
 -- Export shared utilities for global access
 local STATUS = Shared.STATUS
@@ -160,6 +161,7 @@ Ext.Events.SessionLoaded:Subscribe(function()
     AdvancedFeatures.RegisterListeners()
     Eldertide.RegisterListeners()
     Tactics.RegisterListeners()
+    SpellControl.RegisterListeners()
     
     -- Initialize new modules
     Formations.Initialize()
@@ -173,7 +175,7 @@ end)
 ----------------------------------------------------------------------------------
 Ext.Utils.Print("========================================")
 Ext.Utils.Print("AI Allies Mod - Modular Edition Loaded")
-Ext.Utils.Print("Modules: Shared, AI, MCM, Combat, Timer, Dialog, Features, Formations, AdvancedFeatures, Eldertide, Tactics")
+Ext.Utils.Print("Modules: Shared, AI, MCM, Combat, Timer, Dialog, Features, Formations, AdvancedFeatures, Eldertide, Tactics, SpellControl")
 Ext.Utils.Print("Multiplayer Support: ENABLED")
 Ext.Utils.Print("Debug Mode: " .. tostring(CONSTANTS.DEBUG_MODE))
 Ext.Utils.Print("========================================")
