@@ -84,8 +84,11 @@ end
 
 --- Initialize timer cleanup system
 local function InitializeTimerCleanup()
-    -- Start periodic cleanup timer
-    Osi.TimerLaunch("AIAllies_TimerCleanup", TIMER_CLEANUP_INTERVAL)
+    -- Delay Osiris call to avoid restricted context error
+    Ext.OnNextTick(function()
+        -- Start periodic cleanup timer
+        Osi.TimerLaunch("AIAllies_TimerCleanup", TIMER_CLEANUP_INTERVAL)
+    end)
 end
 
 --- Stop timer cleanup system
