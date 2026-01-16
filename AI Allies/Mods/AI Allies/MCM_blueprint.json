@@ -4,100 +4,117 @@
   "Tabs": [
     {
       "TabId": "aiAlliesTab",
-      "TabName": "AI Allies Global Settings",
+      "TabName": "AI Allies Configuration",
       "Sections": [
         {
-          "SectionId": "generalSettings",
-          "SectionName": "General Settings",
+          "SectionId": "archetypeSettings",
+          "SectionName": "🎯 Archetype Options",
           "Settings": [
             {
-              "Id": "enableDebugSpells",
-              "Name": "Enable Debug Spells",
-              "Type": "checkbox",
-              "Default": false,
-              "Description": "Add debug spells to AI Allies: Extra Spells."
-            },
-            {
               "Id": "enableCustomArchetypes",
-              "Name": "Enable Custom Archetypes",
+              "Name": "Custom Archetypes",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Give custom archetype spells."
+              "Description": "Unlock 4 custom AI archetypes ('My Archetype' 1-4) that you can configure with custom behavior patterns. These are player-defined archetypes for specialized builds or unique playstyles not covered by the 13 built-in archetypes.",
+              "Tooltip": "Adds: Target Allies > Custom Archetypes spell container with 4 customizable AI profiles"
             },
             {
               "Id": "enableAlliesMind",
-              "Name": "Enable Mindcontrol Art",
+              "Name": "Mind Control Spells",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Give Mindcontrol spells."
+              "Description": "Grant access to mind control spells that let you directly command NPC allies and controlled creatures. Useful for temporarily taking control of dominated enemies or charmed NPCs during combat.",
+              "Tooltip": "Adds: Target Allies > Mindcontrol Orders spell for NPC/dominated creature control"
             },
             {
               "Id": "enableAlliesSwarm",
-              "Name": "Give Swarm Spells",
+              "Name": "Swarm Tactics (Experimental)",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Give the Swarm Group spells. WARNING: Swarm AI is VERY limited."
-            },
-            {
-              "Id": "enableOrdersBonusAction",
-              "Name": "Enable Focus/Ignore Bonus Action Cost",
-              "Type": "checkbox",
-              "Default": false,
-              "Description": "Makes Focus/Ignore spells cost a bonus action and slightly changes mechanics."
+              "Description": "Enable swarm AI for controlling large groups of summoned creatures or minions. ⚠️ WARNING: Swarm AI uses simplified behavior and may not be as smart as individual companion AI. Best for summoners with multiple creatures.",
+              "Tooltip": "Adds: Swarm Group control spells for mass summon management (limited AI capabilities)"
             }
           ]
         },
         {
-          "SectionId": "combatSettings",
-          "SectionName": "Combat Settings",
+          "SectionId": "combatBehavior",
+          "SectionName": "⚔️ Combat Behavior",
           "Settings": [
             {
               "Id": "disableAlliesDashing",
-              "Name": "Disable Allies Dashing",
+              "Name": "Disable Dash Action",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Disable dashing for all allies."
+              "Description": "Prevent AI allies from using the Dash action to move extra distance. Enable this if your allies are wasting turns dashing instead of fighting, or if you prefer they conserve actions for attacks and spells.",
+              "Tooltip": "Removes: AI ability to use Dash, Longstrider, and similar movement-boosting actions"
             },
             {
               "Id": "disableAlliesThrowing",
-              "Name": "Disable Allies Throwing",
+              "Name": "Disable Throwing Weapons",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Disable throwing for all allies."
+              "Description": "Stop AI allies from throwing weapons, potions, or grenades. Useful if your allies are wasting valuable thrown items or if you want to manually control all throwing actions.",
+              "Tooltip": "Removes: AI ability to use Throw, Tavern Brawler throws, and Berserker throwing abilities"
             },
             {
               "Id": "enableDynamicSpellblock",
-              "Name": "Enable Dynamic Spellblock",
+              "Name": "Smart Spell Slot Conservation",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Block spell usage depending on the character's health percentage."
+              "Description": "AI dynamically blocks high-level spell slots based on ally health. At full health (99%+), blocks all spell slots. As health decreases, gradually unlocks higher spell slots: 90%=1st, 80%=2nd, 70%=3rd, 60%=4th, 50%=5th, 40%=6th. Prevents spell slot waste in easy fights.",
+              "Tooltip": "Recommended for tactician difficulty and resource-conscious gameplay"
+            },
+            {
+              "Id": "enableOrdersBonusAction",
+              "Name": "Bonus Action Orders",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Change Focus/Ignore target spells to cost a bonus action instead of a full action. Makes tactical target prioritization faster but uses your bonus action slot. Good for combat flow but conflicts with other bonus actions.",
+              "Tooltip": "Changes: Focus/Ignore spells become bonus actions with modified mechanics"
             }
           ]
         },
         {
-          "SectionId": "advancedFeatures",
-          "SectionName": "Advanced AI Features",
+          "SectionId": "advancedAI",
+          "SectionName": "🧠 Advanced AI Systems",
           "Settings": [
             {
               "Id": "enableFormations",
-              "Name": "Enable Formation Positioning",
+              "Name": "Tactical Formations",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Enable tactical formation positioning for AI allies (Frontline, Midline, Backline, Scattered)."
+              "Description": "Enable formation-based positioning system. AI allies automatically arrange themselves based on their role: Tanks/Melee in frontline, Supports/Healers in midline, Mages/Ranged in backline, or scattered for stealth/mobility builds. Requires manual formation spell casting.",
+              "Tooltip": "Adds: Formation control spells (Frontline, Midline, Backline, Scattered positioning)"
             },
             {
               "Id": "enableAutoHeal",
-              "Name": "Enable Auto-Heal System",
+              "Name": "Auto-Heal Response",
               "Type": "checkbox",
               "Default": false,
-              "Description": "AI healers automatically respond when allies fall below 50% health."
+              "Description": "AI healers automatically prioritize healing when any ally drops below 50% HP. Overrides normal AI behavior to ensure survival. Healer archetypes will interrupt their actions to cast healing spells when this threshold is reached.",
+              "Tooltip": "Recommended for keeping your party alive in difficult encounters"
             },
             {
               "Id": "enableAggressionModes",
-              "Name": "Enable Aggression Modes",
+              "Name": "Aggression Control",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Enable AI aggression control (Aggressive, Defensive, Support modes)."
+              "Description": "Unlock AI aggression stance controls. Set allies to Aggressive (focus damage), Defensive (prioritize protection/control), or Support (buff allies over attacking). Allows you to adjust AI behavior mid-combat based on the situation.",
+              "Tooltip": "Adds: Aggression mode toggle spells for dynamic combat strategy adjustment"
+            }
+          ]
+        },
+        {
+          "SectionId": "developerTools",
+          "SectionName": "🛠️ Developer Tools",
+          "Settings": [
+            {
+              "Id": "enableDebugSpells",
+              "Name": "Debug Spell Panel",
+              "Type": "checkbox",
+              "Default": false,
+              "Description": "Add debug and testing spells to the 'AI Allies: Extra Spells' container. Includes diagnostic tools for troubleshooting AI behavior, status inspection, and archetype testing. Only enable if you're debugging issues or developing custom content.",
+              "Tooltip": "For mod developers and troubleshooting only - not recommended for normal gameplay"
             }
           ]
         }
