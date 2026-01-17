@@ -45,8 +45,11 @@ function Combat.CheckForDownedAllies(caster)
             local success2, isEnemy = SafeOsiCall(Osi.IsEnemy, caster, ally)
             if success2 and isEnemy == 0 then
                 -- Check if ally is Downed (0 HP / Knocked Out)
-                local hasDownedStatus = Osi.HasStatus(ally, "DOWNED") == 1 or Osi.HasStatus(ally, "MAG_KO_CONDITION") == 1
-                if hasDownedStatus then
+                local hasDownedSuccess, hasDownedStatus = SafeOsiCall(Osi.HasStatus, ally, "DOWNED")
+                local hasKOSuccess, hasKOStatus = SafeOsiCall(Osi.HasStatus, ally, "MAG_KO_CONDITION")
+                
+                local isDowned = (hasDownedSuccess and hasDownedStatus == 1) or (hasKOSuccess and hasKOStatus == 1)
+                if isDowned then
                     -- Get distance with error handling
                     local distSuccess, dist = SafeOsiCall(Osi.GetDistanceTo, caster, ally)
                     if distSuccess and dist and dist >= 0 then
