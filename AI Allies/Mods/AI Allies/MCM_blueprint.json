@@ -83,8 +83,22 @@
               "Name": "Tactical Formations",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Enable formation-based positioning system. AI allies automatically arrange themselves based on their role: Tanks/Melee in frontline, Supports/Healers in midline, Mages/Ranged in backline, or scattered for stealth/mobility builds. Requires manual formation spell casting.",
-              "Tooltip": "Adds: Formation control spells (Frontline, Midline, Backline, Scattered positioning)"
+              "Description": "Enable formation-based positioning system. AI allies automatically arrange themselves based on their role. Use the dropdown below to select which formation your allies should use.",
+              "Tooltip": "Toggle on to activate formation positioning for your allies"
+            },
+            {
+              "Id": "formationType",
+              "Name": "Formation Type",
+              "Type": "dropdown",
+              "Default": "frontline",
+              "Options": {
+                "frontline": "Frontline - Tanks/Melee forward",
+                "midline": "Midline - Supports/Healers center",
+                "backline": "Backline - Mages/Ranged back",
+                "scattered": "Scattered - Spread out (stealth/mobility)"
+              },
+              "Description": "Choose how your allies position themselves in combat. Frontline: aggressive melee positioning. Midline: balanced support positioning. Backline: safe ranged positioning. Scattered: spread out to avoid AoE.",
+              "Tooltip": "Only active when Tactical Formations is enabled"
             },
             {
               "Id": "enableAutoHeal",
@@ -99,8 +113,21 @@
               "Name": "Aggression Control",
               "Type": "checkbox",
               "Default": false,
-              "Description": "Unlock AI aggression stance controls. Set allies to Aggressive (focus damage), Defensive (prioritize protection/control), or Support (buff allies over attacking). Allows you to adjust AI behavior mid-combat based on the situation.",
-              "Tooltip": "Adds: Aggression mode toggle spells for dynamic combat strategy adjustment"
+              "Description": "Enable AI aggression stance controls. Use the dropdown below to set how aggressively your allies engage enemies.",
+              "Tooltip": "Toggle on to activate aggression control for your allies"
+            },
+            {
+              "Id": "aggressionMode",
+              "Name": "Aggression Mode",
+              "Type": "dropdown",
+              "Default": "aggressive",
+              "Options": {
+                "aggressive": "Aggressive - Focus maximum damage",
+                "defensive": "Defensive - Prioritize protection/control",
+                "support": "Support - Buff allies over attacking"
+              },
+              "Description": "Choose your allies' combat stance. Aggressive: focus on damage and finishing enemies. Defensive: prioritize survivability and crowd control. Support: focus on buffing allies and utility.",
+              "Tooltip": "Only active when Aggression Control is enabled"
             }
           ]
         },

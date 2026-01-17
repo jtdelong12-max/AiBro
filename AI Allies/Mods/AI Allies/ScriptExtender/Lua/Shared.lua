@@ -446,18 +446,6 @@ Shared.PASSIVE = {
     GIVE_ALLIES_SPELL = "GiveAlliesSpell",
     ALLIES_TOGGLE_NPC = "AlliesToggleNPC",
     
-    -- Formation passives
-    UNLOCK_FORMATIONS = "UnlockAlliesFormations",
-    
-    -- Advanced feature passives
+    -- Advanced feature passives (unused - kept for compatibility)
     UNLOCK_ADVANCED_AI = "UnlockAdvancedAI",
     UNLOCK_AUTO_HEAL = "UnlockAutoHeal",
-    UNLOCK_AGGRESSION_MODES = "UnlockAggressionModes",
-    
-    -- AI Tactics toggleable passives
-    AI_MODE_AGGRESSIVE = "Passive_AI_Mode_Aggressive",
-    AI_MODE_CONSERVATIVE = "Passive_AI_Mode_Conservative",
-    AI_MODE_AUTOHEAL = "Passive_AI_Mode_AutoHeal"
-}
-
-return Shared

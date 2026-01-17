@@ -144,15 +144,94 @@ function MCM.ManageDebugSpells()
 end
 
 function MCM.ManageFormations()
-    ManageMCMPassive("enableFormations", PASSIVE.UNLOCK_FORMATIONS)
+    if Mods.BG3MCM then
+        local enableFormations = Mods.BG3MCM.MCMAPI:GetSettingValue("enableFormations", MCM.ModuleUUID)
+        local formationType = Mods.BG3MCM.MCMAPI:GetSettingValue("formationType", MCM.ModuleUUID) or "frontline"
+        
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
+        for _, player in pairs(players) do
+            local character = player[1]
+            
+            if enableFormations then
+                -- Remove all formation statuses first
+                Osi.RemoveStatus(character, "FORMATION_FRONTLINE")
+                Osi.RemoveStatus(character, "FORMATION_MIDLINE")
+                Osi.RemoveStatus(character, "FORMATION_BACKLINE")
+                Osi.RemoveStatus(character, "FORMATION_SCATTERED")
+                
+                -- Apply the selected formation
+                if formationType == "frontline" then
+                    Osi.ApplyStatus(character, "FORMATION_FRONTLINE", -1, 1)
+                elseif formationType == "midline" then
+                    Osi.ApplyStatus(character, "FORMATION_MIDLINE", -1, 1)
+                elseif formationType == "backline" then
+                    Osi.ApplyStatus(character, "FORMATION_BACKLINE", -1, 1)
+                elseif formationType == "scattered" then
+                    Osi.ApplyStatus(character, "FORMATION_SCATTERED", -1, 1)
+                end
+            else
+                -- Remove all formations when disabled
+                Osi.RemoveStatus(character, "FORMATION_FRONTLINE")
+                Osi.RemoveStatus(character, "FORMATION_MIDLINE")
+                Osi.RemoveStatus(character, "FORMATION_BACKLINE")
+                Osi.RemoveStatus(character, "FORMATION_SCATTERED")
+            end
+        end
+    end
 end
 
 function MCM.ManageAutoHeal()
-    ManageMCMPassive("enableAutoHeal", PASSIVE.UNLOCK_AUTO_HEAL)
+    if Mods.BG3MCM then
+        local enableAutoHeal = Mods.BG3MCM.MCMAPI:GetSettingValue("enableAutoHeal", MCM.ModuleUUID)
+        
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
+        for _, player in pairs(players) do
+            local character = player[1]
+            
+            if enableAutoHeal then
+                if Osi.HasStatus(character, "ALLIES_AUTO_HEAL") == 0 then
+                    Osi.ApplyStatus(character, "ALLIES_AUTO_HEAL", -1, 1)
+                end
+            else
+                if Osi.HasStatus(character, "ALLIES_AUTO_HEAL") == 1 then
+                    Osi.RemoveStatus(character, "ALLIES_AUTO_HEAL")
+                end
+            end
+        end
+    end
 end
 
 function MCM.ManageAggressionModes()
-    ManageMCMPassive("enableAggressionModes", PASSIVE.UNLOCK_AGGRESSION_MODES)
+    if Mods.BG3MCM then
+        local enableAggression = Mods.BG3MCM.MCMAPI:GetSettingValue("enableAggressionModes", MCM.ModuleUUID)
+        local aggressionMode = Mods.BG3MCM.MCMAPI:GetSettingValue("aggressionMode", MCM.ModuleUUID) or "aggressive"
+        
+        local players = Osi.DB_PartOfTheTeam:Get(nil)
+        for _, player in pairs(players) do
+            local character = player[1]
+            
+            if enableAggression then
+                -- Remove all aggression statuses first
+                Osi.RemoveStatus(character, "ALLIES_AGGRESSIVE")
+                Osi.RemoveStatus(character, "ALLIES_DEFENSIVE")
+                Osi.RemoveStatus(character, "ALLIES_SUPPORT")
+                
+                -- Apply the selected aggression mode
+                if aggressionMode == "aggressive" then
+                    Osi.ApplyStatus(character, "ALLIES_AGGRESSIVE", -1, 1)
+                elseif aggressionMode == "defensive" then
+                    Osi.ApplyStatus(character, "ALLIES_DEFENSIVE", -1, 1)
+                elseif aggressionMode == "support" then
+                    Osi.ApplyStatus(character, "ALLIES_SUPPORT", -1, 1)
+                end
+            else
+                -- Remove all aggression modes when disabled
+                Osi.RemoveStatus(character, "ALLIES_AGGRESSIVE")
+                Osi.RemoveStatus(character, "ALLIES_DEFENSIVE")
+                Osi.RemoveStatus(character, "ALLIES_SUPPORT")
+            end
+        end
+    end
 end
 
 --- Initialize all MCM settings
@@ -227,9 +306,13 @@ function MCM.RegisterListeners(moduleUUID)
                 MCM.ManageDebugSpells()
             elseif payload.settingId == "enableFormations" then
                 MCM.ManageFormations()
+            elseif payload.settingId == "formationType" then
+                MCM.ManageFormations()
             elseif payload.settingId == "enableAutoHeal" then
                 MCM.ManageAutoHeal()
             elseif payload.settingId == "enableAggressionModes" then
+                MCM.ManageAggressionModes()
+            elseif payload.settingId == "aggressionMode" then
                 MCM.ManageAggressionModes()
             end
         end)
