@@ -23,25 +23,50 @@ end
 ----------------------------------------------------------------------------------
 -- Exclusive Passive Management
 ----------------------------------------------------------------------------------
---- Enforce exclusivity between Aggressive and Conservative modes
---- When one mode is toggled on, the other is automatically toggled off
+--- Enforce exclusivity between aggression modes
+--- When one mode is toggled on, the others are automatically toggled off
 function Tactics.RegisterListeners()
     -- Listen for Status Application to enforce exclusivity
     Ext.Osiris.RegisterListener("StatusApplied", 4, "after", function(object, status, causee, storyActionID)
         if status == STATUS.AGGRESSIVE_MODE then
-            -- If Aggressive applied, turn off Conservative
+            -- If Aggressive applied, turn off Defensive and Support
+            if Osi.HasStatus(object, STATUS.DEFENSIVE_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.DEFENSIVE_MODE)
+            end
+            if Osi.HasStatus(object, STATUS.SUPPORT_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.SUPPORT_MODE)
+            end
             if Osi.HasPassive(object, "Passive_AI_Mode_Conservative") == 1 then
                 Osi.RemovePassive(object, "Passive_AI_Mode_Conservative")
-                DebugLog("Tactics: Removed Conservative mode (Aggressive activated)", "TACTICS")
             end
             ShowModeOverhead(object, "Aggressive mode")
         elseif status == STATUS.DEFENSIVE_MODE then
-            -- If Conservative applied, turn off Aggressive
+            -- If Defensive applied, turn off Aggressive and Support
+            if Osi.HasStatus(object, STATUS.AGGRESSIVE_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.AGGRESSIVE_MODE)
+            end
+            if Osi.HasStatus(object, STATUS.SUPPORT_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.SUPPORT_MODE)
+            end
             if Osi.HasPassive(object, "Passive_AI_Mode_Aggressive") == 1 then
                 Osi.RemovePassive(object, "Passive_AI_Mode_Aggressive")
-                DebugLog("Tactics: Removed Aggressive mode (Conservative activated)", "TACTICS")
             end
             ShowModeOverhead(object, "Defensive mode")
+        elseif status == STATUS.SUPPORT_MODE then
+            -- If Support applied, turn off Aggressive and Defensive
+            if Osi.HasStatus(object, STATUS.AGGRESSIVE_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.AGGRESSIVE_MODE)
+            end
+            if Osi.HasStatus(object, STATUS.DEFENSIVE_MODE) == 1 then
+                Osi.RemoveStatus(object, STATUS.DEFENSIVE_MODE)
+            end
+            if Osi.HasPassive(object, "Passive_AI_Mode_Aggressive") == 1 then
+                Osi.RemovePassive(object, "Passive_AI_Mode_Aggressive")
+            end
+            if Osi.HasPassive(object, "Passive_AI_Mode_Conservative") == 1 then
+                Osi.RemovePassive(object, "Passive_AI_Mode_Conservative")
+            end
+            ShowModeOverhead(object, "Support mode")
         elseif status == STATUS.AUTO_HEAL_ENABLED then
             ShowModeOverhead(object, "Auto-heal enabled")
         end
